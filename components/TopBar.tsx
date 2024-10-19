@@ -39,15 +39,17 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
     container: {
       backgroundColor: themeColor,
       height: 144,
-      paddingTop: 36,
+      paddingTop: 40,
       alignItems: 'center',
     },
     buttonContainer: {
       flexDirection: 'row',
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
-      borderRadius: 24,
+      borderRadius: 28,
       padding: 4,
       marginTop: 2,
+      width: '30%',
+      justifyContent: 'space-around'
     },
     button: {
       flexDirection: 'row',
@@ -56,6 +58,7 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
       paddingVertical: 8,
       paddingHorizontal: 16,
       borderRadius: 20,
+      minWidth: 60,
     },
     activeButton: {
       backgroundColor: buttonColor,
@@ -91,19 +94,20 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
             style={[styles.button, activeButton === 'Car' && styles.activeButton]}
             onPress={() => setActiveButton('Car')}
           >
-            <Ionicons name="car" size={20} color={activeButton === 'Car' ? themeColor : '#FFFFFF'} />
+            <Ionicons name="car" size={24} color={activeButton === 'Car' ? themeColor : '#FFFFFF'} />
+            <Text style={[styles.buttonText, activeButton === 'Car' && styles.activeButtonText]}>4 min</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, activeButton === 'Walk' && styles.activeButton]}
             onPress={() => setActiveButton('Walk')}
           >
-            <Ionicons name="walk" size={20} color={activeButton === 'Walk' ? themeColor : '#FFFFFF'} />
+            <Ionicons name="walk" size={24} color={activeButton === 'Walk' ? themeColor : '#FFFFFF'} />
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.button, activeButton === 'Bike' && styles.activeButton]}
             onPress={() => setActiveButton('Bike')}
           >
-            <Ionicons name="bicycle" size={20} color={activeButton === 'Bike' ? themeColor : '#FFFFFF'} />
+            <Ionicons name="bicycle" size={24} color={activeButton === 'Bike' ? themeColor : '#FFFFFF'} />
           </TouchableOpacity>
         </View>
       )}
