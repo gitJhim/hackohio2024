@@ -13,7 +13,9 @@ const Profile = () => {
           paddingBottom: 100,
         }}
       >
-        <View className="h-56 bg-[#17A773] items-center justify-end "></View>
+        <View
+          className={`h-56 ${user?.type == "driver" ? " bg-[#17A773]" : "bg-[#8B5CF6]"} items-center justify-end `}
+        ></View>
         <View className="flex-1 bg-backgroundLight dark:bg-backgroundDark bg-opacity-10 items-center">
           <Image
             source={{ uri: user?.avatar_url || "" }}
@@ -28,6 +30,7 @@ const Profile = () => {
             className="bg-white"
           />
           <Text className="text-black text-xl -mt-16">@{user?.name}</Text>
+          <Text className="text-black text-xl">{user?.type || ""}</Text>
         </View>
       </ScrollView>
     </View>

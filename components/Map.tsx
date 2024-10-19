@@ -11,15 +11,23 @@ import * as Location from "expo-location";
 import { useMapStore } from "../state/stores/mapStore";
 import { useUserStore } from "../state/stores/userStore";
 import { getPickups } from "../utils/db/map";
-import { LucideCalendarDays, LucideCar } from "lucide-react-native";
+import {
+  LucideCalendarDays,
+  LucideCar,
+  LucideHardDriveUpload,
+  LucideLocate,
+  LucidePlus,
+} from "lucide-react-native";
 import Geocoder from "react-native-geocoding";
 import { GOOGLE_MAPS_API_KEY } from "@env";
+import { Pickup } from "../types/map.types";
 
 export default function Map() {
   Geocoder.init(`${GOOGLE_MAPS_API_KEY}`);
   const pickups = useMapStore((state) => state.pickups);
   const setPickups = useMapStore((state) => state.setPickups);
   const user = useUserStore((state) => state.user);
+
   const initialLocation = {
     latitude: 39.75,
     longitude: -84.19,
@@ -81,28 +89,28 @@ export default function Map() {
 
   const renderMarkers = () => {
     if (!pickups) return;
-    return pickups.map((marker) => (
-      <BinMarker marker={marker} key={marker.id} />
+    return pickups.map((pickup) => (
+      <PickupMarker pickup={pickup} key={pickup.id} />
     ));
   };
 
-  const BinMarker = ({ marker }: { marker: MarkerType }) => {
+  const PickupMarker = ({ pickup }: { pickup: Pickup }) => {
     return (
       <Marker
-        key={marker.id}
+        key={pickup.id}
         coordinate={{
-          latitude: marker.latitude,
-          longitude: marker.longitude,
+          latitude: pickup.latitude,
+          longitude: pickup.longitude,
         }}
-        onPress={() => setSelectedMarker(marker)}
-        onDeselect={() => setSelectedMarker(null)}
+        onPress={() => {}}
+        onDeselect={() => {}}
       >
-        <Callout onPress={() => setRecycleModalVisible(true)}>
+        <Callout onPress={() => {}}>
           <View className="bg-white rounded-2xl overflow-hidden shadow-lg w-72">
             <Text className=""></Text>
             <View className="p-4">
               <Text className="text-2xl font-bold mb-3 text-center text-green-700">
-                {marker.title}
+                {pickup.title}
               </Text>
               <View className="space-y-2">
                 <InfoRow label="Estimated Capacity" value={"0%"} />
@@ -139,10 +147,10 @@ export default function Map() {
         onPress={goToCurrentLocation}
         style={styles.relocateButton}
       >
-        <LucideCar />
+        <LucideLocate size={24} color="#8B5CF6" />
       </TouchableOpacity>
       <TouchableOpacity style={styles.addButton}>
-        <LucideCalendarDays />
+        <LucidePlus size={24} color="#fff" />
       </TouchableOpacity>
     </View>
   );
@@ -163,7 +171,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: Dimensions.get("window").height * 0.18,
     right: Dimensions.get("window").width * 0.05,
-    backgroundColor: "#17A773",
+    backgroundColor: "#8B5CF6",
     padding: 16,
     borderRadius: 24,
   },
