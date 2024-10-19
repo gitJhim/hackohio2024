@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image, FlatList } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import useFoodvisor from "../hooks/useFoodvisor";
+import { useFoodvisor } from "../hooks/useFoodvisor";
 
 export default function Test() {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset>();

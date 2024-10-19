@@ -15,6 +15,7 @@ import { LucideLocate, LucidePlus } from "lucide-react-native";
 import Geocoder from "react-native-geocoding";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
+import DonateFoodModal from "./DonateFoodModal";
 
 export default function Map() {
   Geocoder.init(`${GOOGLE_MAPS_API_KEY}`);
@@ -22,6 +23,7 @@ export default function Map() {
   const setPickups = useMapStore((state) => state.setPickups);
   const user = useUserStore((state) => state.user);
 
+  const [isDonateModalVisible, setIsDonateModalVisible] = useState(false);
   const initialLocation = {
     latitude: 39.75,
     longitude: -84.19,
@@ -137,6 +139,10 @@ export default function Map() {
   };
   return (
     <View className="flex flex-col justify-center items-center">
+      <DonateFoodModal
+        setModalVisible={setIsDonateModalVisible}
+        isModalVisible={isDonateModalVisible}
+      />
       <MapView
         style={styles.map}
         region={region}
@@ -158,6 +164,7 @@ export default function Map() {
       </TouchableOpacity>
       <TouchableOpacity
         style={[styles.addButton, { backgroundColor: getThemeColor() }]}
+        onPress={() => setIsDonateModalVisible(true)}
       >
         <LucidePlus size={24} color="#fff" />
       </TouchableOpacity>

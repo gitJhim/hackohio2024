@@ -1,6 +1,6 @@
-import { useState, useCallback } from 'react';
-import axios from 'axios';
-import { FOOD_API } from '@env';  
+import { useState, useCallback } from "react";
+import axios from "axios";
+import { FOOD_API } from "@env";
 
 interface FoodvisorResponse {
   items: {
@@ -12,7 +12,7 @@ interface FoodvisorResponse {
   }[];
 }
 
-const useFoodvisor = () => {
+export const useFoodvisor = () => {
   const [foodNames, setFoodNames] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -22,10 +22,10 @@ const useFoodvisor = () => {
     const apiKey = FOOD_API;
 
     const formData = new FormData();
-    formData.append('image', {
+    formData.append("image", {
       uri: imageUri,
-      type: 'image/jpg',
-      name: 'photo.jpg',
+      type: "image/jpg",
+      name: "photo.jpg",
     } as any); // 'as any' is used here because FormData expects a different type than what we're providing
 
     setLoading(true);
@@ -34,8 +34,8 @@ const useFoodvisor = () => {
     try {
       const response = await axios.post<FoodvisorResponse>(apiUrl, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Api-Key ${apiKey}`,
+          "Content-Type": "multipart/form-data",
+          Authorization: `Api-Key ${apiKey}`,
         },
       });
 
@@ -49,8 +49,8 @@ const useFoodvisor = () => {
 
       setFoodNames(names);
     } catch (error) {
-      console.error('Error analyzing image:', error);
-      setError('Failed to analyze image');
+      console.error("Error analyzing image:", error);
+      setError("Failed to analyze image");
     } finally {
       setLoading(false);
     }
@@ -59,4 +59,3 @@ const useFoodvisor = () => {
   return { foodNames, analyzeImageWithFoodvisor, loading, error };
 };
 
-export default useFoodvisor;
