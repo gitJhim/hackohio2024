@@ -16,6 +16,7 @@ import Geocoder from "react-native-geocoding";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
 import DonateFoodModal from "./DonateFoodModal";
+import MapViewDirections from "react-native-maps-directions";
 
 export default function Map() {
   Geocoder.init(`${GOOGLE_MAPS_API_KEY}`);
@@ -62,16 +63,16 @@ export default function Map() {
   };
 
   useEffect(() => {
-    const loadMarkers = async () => {
-      const { data: markers, error } = await getPickups();
+    const loadPickups = async () => {
+      const { data: pickups, error } = await getPickups();
       if (error) {
         console.error("Error loading markers:", error.message);
       } else {
-        setPickups(markers);
+        setPickups(pickups);
       }
     };
 
-    loadMarkers();
+    loadPickups();
     getCurrentLocation();
   }, []);
 
@@ -113,6 +114,7 @@ export default function Map() {
         }}
         onPress={() => {}}
         onDeselect={() => {}}
+        image={require("../assets/package.png")}
       >
         <Callout onPress={() => {}}>
           <View className="bg-white rounded-2xl overflow-hidden shadow-lg w-72">
@@ -128,7 +130,7 @@ export default function Map() {
               </View>
               <View className="bg-green-600 py-3 px-4 rounded-xl mt-4 shadow-md">
                 <Text className="text-white font-bold text-center text-lg">
-                  Recycle Now
+                  Start Pickup
                 </Text>
               </View>
             </View>
@@ -156,6 +158,36 @@ export default function Map() {
           goToCurrentLocation();
         }}
       >
+        {myLocation && (
+          <>
+            <MapViewDirections
+              origin={{
+                latitude: myLocation.latitude,
+                longitude: myLocation.longitude,
+              }}
+              destination={{
+                latitude: pickups[0].latitude,
+                longitude: pickups[0].longitude,
+              }}
+              apikey={`${GOOGLE_MAPS_API_KEY}`}
+              strokeWidth={4}
+              strokeColor="red"
+              mode={"TRANSIT"}
+            />
+
+            <Marker
+              key={"user"}
+              coordinate={{
+                latitude: myLocation.latitude,
+                longitude: myLocation.longitude,
+              }}
+              onPress={() => {}}
+              onDeselect={() => {}}
+              image={require("../assets/you.png")}
+            />
+          </>
+        )}
+
         {renderMarkers()}
       </MapView>
       <TouchableOpacity
