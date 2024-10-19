@@ -39,14 +39,14 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
     container: {
       backgroundColor: themeColor,
       height: 144,
-      paddingTop: 40,
+      paddingTop: 36,
       alignItems: 'center',
     },
     buttonContainer: {
       flexDirection: 'row',
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
       borderRadius: 28,
-      padding: 4,
+      padding: 2,
       marginTop: 2,
       width: '30%',
       justifyContent: 'space-around'
