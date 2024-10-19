@@ -2,6 +2,7 @@
   "expo": {
     "name": "hackohio2024",
     "slug": "hackohio2024",
+    "sceme": "com.jhimmy.hackohio2024",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,7 +20,13 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.jhimmy.hackohio2024"
+      "package": "com.jhimmy.hackohio2024",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBNzWXwQd3_y977IifYs259S3WEuIMY_hg"
+        }
+      },
+      "permissions": ["CAMERA", "RECORD_AUDIO"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -28,6 +35,23 @@
       "eas": {
         "projectId": "d24f7231-ff82-4d69-99ea-ab4706d7d51d"
       }
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
+          "recordAudioAndroid": true
+        }
+      ],
+      "expo-router",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.156165157980-mr98u2molp7k41g51rsanfncuja8no5l"
+        }
+      ]
+    ]
   }
 }
