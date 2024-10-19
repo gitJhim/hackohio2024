@@ -11,13 +11,7 @@ import * as Location from "expo-location";
 import { useMapStore } from "../state/stores/mapStore";
 import { useUserStore } from "../state/stores/userStore";
 import { getPickups } from "../utils/db/map";
-import {
-  LucideCalendarDays,
-  LucideCar,
-  LucideHardDriveUpload,
-  LucideLocate,
-  LucidePlus,
-} from "lucide-react-native";
+import { LucideLocate, LucidePlus } from "lucide-react-native";
 import Geocoder from "react-native-geocoding";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
@@ -50,6 +44,19 @@ export default function Map() {
     }
     let location = await Location.getCurrentPositionAsync({});
     setMyLocation(location.coords);
+  };
+
+  const getThemeColor = () => {
+    switch (user?.type) {
+      case "driver":
+        return "#17A773";
+      case "foodbank":
+        return "#8B5CF6";
+      case "donor":
+        return "#EF4444";
+      default:
+        return "#808080";
+    }
   };
 
   useEffect(() => {
@@ -145,11 +152,13 @@ export default function Map() {
       </MapView>
       <TouchableOpacity
         onPress={goToCurrentLocation}
-        style={styles.relocateButton}
+        style={[styles.relocateButton, { borderColor: getThemeColor() }]}
       >
-        <LucideLocate size={24} color="#8B5CF6" />
+        <LucideLocate size={24} color={getThemeColor()} />
       </TouchableOpacity>
-      <TouchableOpacity style={styles.addButton}>
+      <TouchableOpacity
+        style={[styles.addButton, { backgroundColor: getThemeColor() }]}
+      >
         <LucidePlus size={24} color="#fff" />
       </TouchableOpacity>
     </View>

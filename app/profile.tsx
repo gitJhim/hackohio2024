@@ -5,32 +5,52 @@ import React from "react";
 const Profile = () => {
   const user = useUserStore((state) => state.user);
 
+  const getHeaderColor = () => {
+    switch (user?.type) {
+      case "driver":
+        return "#17A773";
+      case "foodbank":
+        return "#8B5CF6";
+      case "donor":
+        return "#EF4444";
+      default:
+        return "#808080";
+    }
+  };
+
   return (
     <View className="h-full">
       <ScrollView
-        className="flex-1 bg-backgroundLight dark:bg-backgroundDark"
+        className="flex-1 bg-white dark:bg-gray-900"
         contentContainerStyle={{
           paddingBottom: 100,
         }}
       >
         <View
-          className={`h-56 ${user?.type == "driver" ? " bg-[#17A773]" : "bg-[#8B5CF6]"} items-center justify-end `}
-        ></View>
-        <View className="flex-1 bg-backgroundLight dark:bg-backgroundDark bg-opacity-10 items-center">
+          className="h-56 items-center justify-end"
+          style={{ backgroundColor: getHeaderColor() }}
+        />
+        <View className="flex-1 bg-white dark:bg-gray-900 bg-opacity-10 items-center">
           <Image
-            source={{ uri: user?.avatar_url || "" }}
+            source={{
+              uri: user?.avatar_url || "https://via.placeholder.com/120",
+            }}
             style={{
               width: 120,
               height: 120,
               borderRadius: 60,
               borderWidth: 4,
               borderColor: "white",
-              top: -60,
+              marginTop: -60,
             }}
             className="bg-white"
           />
-          <Text className="text-black text-xl -mt-16">@{user?.name}</Text>
-          <Text className="text-black text-xl">{user?.type || ""}</Text>
+          <Text className="text-black dark:text-white text-xl mt-4">
+            @{user?.name || "Username"}
+          </Text>
+          <Text className="text-black dark:text-white text-xl mt-2 capitalize">
+            {user?.type || "User"}
+          </Text>
         </View>
       </ScrollView>
     </View>

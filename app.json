@@ -2,7 +2,7 @@
   "expo": {
     "name": "hackohio2024",
     "slug": "hackohio2024",
-    "sceme": "hackohio2024",
+    "sceme": "com.jhimmy.hackohio2024",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

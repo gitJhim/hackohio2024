@@ -20,7 +20,7 @@ export type User = {
   type: UserType;
 };
 
-export type UserType = "driver" | "foodbank";
+export type UserType = "driver" | "foodbank" | "donor";
 
 export type Event = {
   id: string | null;

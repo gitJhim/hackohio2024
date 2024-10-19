@@ -17,26 +17,18 @@ export const Navigator = () => {
   const pathName = usePathname();
   const [open, setOpen] = useState(false);
   const [visible, isVisible] = useState(true);
-  const [userType, setUserType] = useState("");
   const rotation = useSharedValue(0);
   const offset1 = useSharedValue({ x: 0, y: 0 });
   const offset2 = useSharedValue({ x: 0, y: 0 });
   const offset3 = useSharedValue({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (pathName == "/") {
+    if (pathName == "/onboarding" || pathName == "/") {
       isVisible(false);
     } else {
       isVisible(true);
     }
   }, [pathName]);
-
-  useEffect(() => {
-    if (user) {
-      setUserType(user.type);
-      console.log(user.type);
-    }
-  }, [user]);
 
   const handlePress = () => {
     setOpen(!open);
@@ -81,15 +73,29 @@ export const Navigator = () => {
   };
 
   const getButtonStyle = () => {
-    return userType === "foodbank"
-      ? styles.foodbankbutton
-      : styles.driverbutton;
+    switch (user?.type) {
+      case "foodbank":
+        return styles.foodbankbutton;
+      case "driver":
+        return styles.driverbutton;
+      case "donor":
+        return styles.donatorbutton;
+      default:
+        return styles.driverbutton;
+    }
   };
 
   const getActiveButtonStyle = () => {
-    return userType === "foodbank"
-      ? styles.foodbankactiveButton
-      : styles.driveractiveButton;
+    switch (user?.type) {
+      case "foodbank":
+        return styles.foodbankactiveButton;
+      case "driver":
+        return styles.driveractiveButton;
+      case "donor":
+        return styles.donatoractiveButton;
+      default:
+        return styles.driveractiveButton;
+    }
   };
 
   const animatedStyle1 = useAnimatedStyle(() => ({
@@ -234,6 +240,32 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#217557", // Darker green for active state
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  donatorbutton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#EF4444", // Red for donator
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  donatoractiveButton: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#DC2626", // Darker red for active state
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
