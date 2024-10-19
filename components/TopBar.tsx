@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Image, Text, Pressable } from 'react-native';
 
+
+
 export default function TopBar({ showButtons = true, isDriver = false }) {
   const bgColor = isDriver ? 'bg-[#17A773]' : 'bg-[#8A2BE2]';
   const buttonBgColor = isDriver ? 'bg-[#B1ECC8]' : 'bg-[#E6E6FA]';
