@@ -56,6 +56,18 @@ export const updateUser = async (session: Session) => {
   return { user: data, error };
 };
 
+export const setUserType = async (userId: string, type: string) => {
+  const { data, error } = await supabase
+    .from("users")
+    .update({
+      type: type,
+    })
+    .eq("id", userId)
+    .select("*");
+
+  return { user: data, error };
+};
+
 export const loadLogs = async (userId: string) => {
   const { data, error } = await supabase
     .from("logs")

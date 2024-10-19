@@ -1,14 +1,12 @@
 import React from "react";
 import { Text, View } from "react-native";
+import { useUserStore } from "../state/stores/userStore";
+import Map from "../components/Map";
 
 const HomeScreen = () => {
-  return (
-    <View className="flex-1 items-center justify-center bg-lightBackground dark:bg-darkBackground p-4">
-      <Text className="text-red-500">
-        Opn up App.tsx to start working on your app!
-      </Text>
-    </View>
-  );
+  const user = useUserStore((state) => state.user);
+
+  return <Map />;
 };
 
 export default HomeScreen;

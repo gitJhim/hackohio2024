@@ -77,33 +77,14 @@ export default function SignInPage() {
 
         checkUser = data;
         console.log("Inserted new user:", user);
-      } else {
-        console.log("User found, updating user...");
-        const { user: updatedUser, error: updateError } =
-          await updateUser(session);
-
-        if (updateError) {
-          console.error("Error updating user:", updateError.message);
-          setErrorText("Error updating user: " + updateError.message);
-          return;
-        }
-
-        checkUser = updatedUser?.length ? updatedUser[0] : null;
-        console.log("Updated user:", checkUser);
-      }
-
-      if (!checkUser) {
-        console.error("User is null after database operations.");
-        setErrorText("User is null after database operations.");
-        return;
       }
 
       console.log("User data set in store:", checkUser);
       setUser(checkUser);
 
-      if (!checkUser.username) {
+      if (!checkUser.type) {
         console.log("Redirecting to /onboarding");
-        router.navigate("/home");
+        router.navigate("/onboarding");
       } else {
         console.log("Redirecting to /profile");
         router.navigate("/home");

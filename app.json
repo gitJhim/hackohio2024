@@ -23,7 +23,7 @@
       "package": "com.jhimmy.hackohio2024",
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyCofnaduYh7txdrqbEhz1PgXFeA4p85W08"
+          "apiKey": "AIzaSyBNzWXwQd3_y977IifYs259S3WEuIMY_hg"
         }
       },
       "permissions": ["CAMERA", "RECORD_AUDIO"]
