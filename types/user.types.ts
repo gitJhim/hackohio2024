@@ -15,9 +15,8 @@ export type User = {
   id: string | null;
   name: string | null;
   email: string | null;
-  username: string | null;
   avatar_url: string | null;
-  lastSignIn: Date | null;
+  last_sign_in: string | null;
   type: UserType;
 };
 
