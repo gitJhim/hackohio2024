@@ -119,7 +119,7 @@ export default function Map() {
             <Text className=""></Text>
             <View className="p-4">
               <Text className="text-2xl font-bold mb-3 text-center text-green-700">
-                {pickup.title}
+                {pickup.food_items.length}
               </Text>
               <View className="space-y-2">
                 <InfoRow label="Estimated Capacity" value={"0%"} />
@@ -142,6 +142,8 @@ export default function Map() {
       <DonateFoodModal
         setModalVisible={setIsDonateModalVisible}
         isModalVisible={isDonateModalVisible}
+        latitude={myLocation?.latitude}
+        longitude={myLocation?.longitude}
       />
       <MapView
         style={styles.map}

@@ -4,14 +4,23 @@ import Modal from "react-native-modal";
 import { Camera } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useFoodvisor } from "../hooks/useFoodvisor";
+import { useUserStore } from "../state/stores/userStore";
+import { Pickup } from "../types/map.types";
+import { addPickup } from "../utils/db/map";
+import uuid from "react-native-uuid";
 
 const FoodImageModal = ({
   setModalVisible,
   isModalVisible,
+  latitude,
+  longitude,
 }: {
-  setModalVisible: () => void;
+  setModalVisible: any;
   isModalVisible: boolean;
+  latitude: number | undefined;
+  longitude: number | undefined;
 }) => {
+  const user = useUserStore((state) => state.user);
   const toggleModal = () => {
     setModalVisible();
   };
@@ -51,8 +60,20 @@ const FoodImageModal = ({
     }
   };
 
-  const handleSubmit = () => {
-    // Handle submit logic here
+  const handleSubmit = async () => {
+    if (!user || !user.id) return;
+    if (!latitude || !longitude) return;
+
+    const pickup: Pickup = {
+      id: uuid.v4().toString(),
+      user_id: user.id,
+      latitude: latitude,
+      longitude: longitude,
+      food_items: foodNames,
+    };
+
+    await addPickup(pickup);
+
     toggleModal();
   };
 
