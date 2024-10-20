@@ -113,10 +113,10 @@ const DeliveredScreen = () => {
       ...starAnimations,
     ]).start();
 
-    // Set a timeout to navigate back after 3 seconds
+    // Set a timeout to navigate back after 4 seconds
     const timer = setTimeout(() => {
-      router.back();
-    }, 5000);
+      router.push('/request');
+    }, 4000);
 
     // Clean up the timer if the component unmounts
     return () => clearTimeout(timer);
