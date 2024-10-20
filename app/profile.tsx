@@ -21,14 +21,6 @@ import { Pickup } from "../types/map.types";
 import { Request } from "../types/request.types";
 import { getRequests } from "../utils/db/requests";
 import { getDeliveries } from "../utils/db/deliveries";
-interface Delivery {
-  id: string;
-  route: string;
-  items: string;
-  date: string;
-  status: "in-progress" | "completed";
-}
-
 const Profile = () => {
   const user = useUserStore((state) => state.user);
   const pickups = useUserStore((state) => state.pickups);
@@ -135,9 +127,6 @@ const Profile = () => {
           </Text>
         </View>
       </View>
-      <Text className="text-sm font-semibold text-gray-700 mt-1">
-        {item.route}
-      </Text>
       <Text className="text-sm text-gray-600 mt-1">{item.items}</Text>
       <Text className="text-xs text-gray-500 mt-2">{item.created_at}</Text>
     </View>
