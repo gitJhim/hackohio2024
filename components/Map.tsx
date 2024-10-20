@@ -6,7 +6,7 @@ import {
   Dimensions,
   Text,
   TouchableOpacity,
-  Button
+  Button,
 } from "react-native";
 import * as Location from "expo-location";
 import { useMapStore } from "../state/stores/mapStore";
@@ -19,6 +19,7 @@ import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
 import { getDistance } from "geolib";
 import FoodRequestModal from "./RequestFoodModal";
+import { useRouter } from "expo-router";
 
 export default function Map() {
   const pickups = useMapStore((state) => state.pickups);
@@ -71,9 +72,10 @@ export default function Map() {
   };
 
   const router = useRouter();
+
   const onDelivered = async () => {
     router.push("/delivered");
-  }
+  };
 
   const updateTravelInfo = (result: any) => {
     setTravelInfo({
