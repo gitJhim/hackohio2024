@@ -118,6 +118,12 @@ export const setPickupStatus = async (
   return { data, error };
 };
 
+export const getAllUsers = async () => {
+  const { data, error } = await supabase.from("users").select("*");
+
+  return { data, error };
+};
+
 export const loadLogs = async (userId: string) => {
   const { data, error } = await supabase
     .from("logs")

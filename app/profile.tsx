@@ -1,16 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   Text,
   View,
   Image,
-  TextInput,
   TouchableOpacity,
   FlatList,
 } from "react-native";
 import { useUserStore } from "../state/stores/userStore";
 import {
-  Plus,
   Trash2,
   Edit2,
   Clock,
@@ -20,21 +18,8 @@ import {
   HeartHandshakeIcon,
 } from "lucide-react-native";
 import { Pickup } from "../types/map.types";
-
-interface RequestedItem {
-  id: string;
-  name: string;
-  current: number;
-  required: number;
-}
-
-interface Donation {
-  id: string;
-  items: string;
-  date: string;
-  status: "pending" | "complete";
-}
-
+import { Request } from "../types/request.types";
+import { getRequests } from "../utils/db/requests";
 interface Delivery {
   id: string;
   route: string;
@@ -46,14 +31,8 @@ interface Delivery {
 const Profile = () => {
   const user = useUserStore((state) => state.user);
   const pickups = useUserStore((state) => state.pickups);
-  const [newItemName, setNewItemName] = useState("");
-  const [newItemRequired, setNewItemRequired] = useState("");
-  const [requestedItems, setRequestedItems] = useState<RequestedItem[]>([
-    { id: "1", name: "Canned Soup", current: 50, required: 100 },
-    { id: "2", name: "Rice", current: 30, required: 50 },
-    { id: "3", name: "Beans", current: 25, required: 75 },
-  ]);
-  const [editingItem, setEditingItem] = useState<string | null>(null);
+  const requests = useUserStore((state) => state.requests);
+  const setRequests = useUserStore((state) => state.setRequests);
 
   const [deliveryHistory, setDeliveryHistory] = useState<Delivery[]>([
     {
@@ -112,92 +91,34 @@ const Profile = () => {
     }
   };
 
-  const addItem = () => {
-    if (newItemName.trim() && newItemRequired.trim()) {
-      const newItem: RequestedItem = {
-        id: Date.now().toString(),
-        name: newItemName.trim(),
-        current: 0,
-        required: parseInt(newItemRequired.trim(), 10),
-      };
-      setRequestedItems([...requestedItems, newItem]);
-      setNewItemName("");
-      setNewItemRequired("");
-    }
-  };
+  useEffect(() => {
+    const loadRequests = async () => {
+      if (!user || !user.id) return;
+      const requests = await getRequests(user?.id);
+      setRequests(requests.data);
+    };
 
-  const deleteItem = (id: string) => {
-    setRequestedItems(requestedItems.filter((item) => item.id !== id));
-  };
-
-  const startEditing = (id: string) => {
-    setEditingItem(id);
-  };
-
-  const saveEdit = (id: string, current: string, required: string) => {
-    setRequestedItems(
-      requestedItems.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              current: parseInt(current, 10),
-              required: parseInt(required, 10),
-            }
-          : item,
-      ),
-    );
-    setEditingItem(null);
-  };
-
-  const renderRequestedItem = ({ item }: { item: RequestedItem }) => (
+    loadRequests();
+  }, []);
+  const renderRequestedItem = ({ item }: { item: Request }) => (
     <View className="mb-4 p-4 bg-white rounded-lg shadow-md">
-      <Text className="text-lg font-bold text-purple-600">{item.name}</Text>
-      {editingItem === item.id ? (
-        <View className="flex-row items-center mt-2">
-          <TextInput
-            className="w-12 bg-gray-100 text-purple-800 p-1 mr-1 text-center rounded"
-            defaultValue={item.current.toString()}
-            keyboardType="numeric"
-            onChangeText={(text) => (item.current = parseInt(text, 10))}
-          />
-          <Text className="text-purple-800">/</Text>
-          <TextInput
-            className="w-12 bg-gray-100 text-purple-800 p-1 ml-1 mr-2 text-center rounded"
-            defaultValue={item.required.toString()}
-            keyboardType="numeric"
-            onChangeText={(text) => (item.required = parseInt(text, 10))}
-          />
-          <TouchableOpacity
-            className="ml-auto m-3"
-            onPress={() =>
-              saveEdit(
-                item.id,
-                item.current.toString(),
-                item.required.toString(),
-              )
-            }
-          >
-            <Text className="text-purple-600 font-bold">Save</Text>
+      <Text className="text-lg font-bold text-purple-600">
+        {item.food_item}
+      </Text>
+
+      <View className="flex-row justify-between items-center mt-2">
+        <Text className="text-sm text-gray-700">
+          Quantity: {item.current}/{item.required}
+        </Text>
+        <View className="flex-row">
+          <TouchableOpacity className="mr-2">
+            <Edit2 color="#8B5CF6" size={20} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => {}}>
+            <Trash2 color="#8B5CF6" size={20} />
           </TouchableOpacity>
         </View>
-      ) : (
-        <View className="flex-row justify-between items-center mt-2">
-          <Text className="text-sm text-gray-700">
-            Quantity: {item.current}/{item.required}
-          </Text>
-          <View className="flex-row">
-            <TouchableOpacity
-              onPress={() => startEditing(item.id)}
-              className="mr-2"
-            >
-              <Edit2 color="#8B5CF6" size={20} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => deleteItem(item.id)}>
-              <Trash2 color="#8B5CF6" size={20} />
-            </TouchableOpacity>
-          </View>
-        </View>
-      )}
+      </View>
     </View>
   );
 
@@ -294,38 +215,11 @@ const Profile = () => {
                 Requested Items
               </Text>
               <FlatList
-                data={requestedItems}
+                data={requests}
                 renderItem={renderRequestedItem}
                 keyExtractor={(item) => item.id}
                 scrollEnabled={false}
               />
-
-              <View className="mt-4 mb-4 p-4 bg-white rounded-lg shadow-md">
-                <Text className="text-lg font-bold text-purple-600 mb-2">
-                  Add New Item
-                </Text>
-                <View className="flex-row mb-2">
-                  <TextInput
-                    className="flex-1 bg-gray-100 text-purple-800 p-2 rounded-l-md"
-                    placeholder="Item name"
-                    value={newItemName}
-                    onChangeText={setNewItemName}
-                  />
-                  <TextInput
-                    className="w-20 bg-gray-100 text-purple-800 p-2 text-center"
-                    placeholder="Required"
-                    value={newItemRequired}
-                    onChangeText={setNewItemRequired}
-                    keyboardType="numeric"
-                  />
-                  <TouchableOpacity
-                    className="bg-purple-600 rounded-r-md p-2 justify-center items-center"
-                    onPress={addItem}
-                  >
-                    <Plus color="white" size={24} />
-                  </TouchableOpacity>
-                </View>
-              </View>
             </View>
           )}
 

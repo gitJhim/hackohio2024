@@ -14,6 +14,10 @@ export type UserStore = {
   pickups: Pickup[];
   addNewPickup: (pickup: Pickup) => void;
   setPickups: (pickups: Pickup[]) => void;
+
+  requests: Request[];
+  addNewRequest: (request: Request) => void;
+  setRequests: (requests: Request[]) => void;
 };
 
 export type User = {

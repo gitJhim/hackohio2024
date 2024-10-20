@@ -13,6 +13,7 @@ export const useUserStore = create<UserStore>(
       logs: [],
       session: null,
       pickups: [],
+      requests: [],
 
       setLogs: (logs: Event[]) => set({ logs }),
       addLog: (log: Event) =>
@@ -25,6 +26,11 @@ export const useUserStore = create<UserStore>(
       addNewPickup: (pickup: Pickup) =>
         set((state: { pickups: Pickup[] }) => {
           [...state.pickups, pickup];
+        }),
+      setRequests: (requests: Request[]) => set({ requests }),
+      addNewRequest: (request: Request) =>
+        set((state: { requests: Request[] }) => {
+          [...state.requests, request];
         }),
     })),
     {
