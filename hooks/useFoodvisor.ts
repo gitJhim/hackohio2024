@@ -7,6 +7,7 @@ interface FoodvisorResponse {
     food: Array<{
       food_info: {
         display_name: string;
+        g_per_serving: number;
       };
     }>;
   }[];
@@ -16,6 +17,7 @@ export const useFoodvisor = () => {
   const [foodNames, setFoodNames] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [sumWeight, setSumWeight] = useState<number>();
 
   const analyzeImageWithFoodvisor = useCallback(async (imageUri: string) => {
     const apiUrl = "https://vision.foodvisor.io/api/1.0/en/analysis/";
@@ -40,13 +42,16 @@ export const useFoodvisor = () => {
       });
 
       const names: string[] = [];
+      let sum = 0;
       for (let i = 0; i < response.data.items.length; i++) {
         const item = response.data.items[i];
         if (item.food && item.food.length > 0) {
           names.push(item.food[0].food_info.display_name);
+          sum = sum + item.food[0].food_info.g_per_serving;
         }
       }
 
+      setSumWeight(sum);
       setFoodNames(names);
     } catch (error) {
       console.error("Error analyzing image:", error);
@@ -56,6 +61,6 @@ export const useFoodvisor = () => {
     }
   }, []);
 
-  return { foodNames, analyzeImageWithFoodvisor, loading, error };
+  return { sumWeight, foodNames, analyzeImageWithFoodvisor, loading, error };
 };
 

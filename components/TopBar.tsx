@@ -3,6 +3,7 @@ import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useUserStore } from "../state/stores/userStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useMapStore } from "../state/stores/mapStore";
+import Toast from "react-native-toast-message";
 
 export default function TopBar() {
   const [activeButton, setActiveButton] = useState("Car");
@@ -33,6 +34,14 @@ export default function TopBar() {
 
   const themeColor = getThemeColor();
   const buttonColor = getButtonColor();
+
+  const showToast = () => {
+    Toast.show({
+      type: 'success',
+      text1: '',
+      text2: ''
+    });
+  }
 
   const styles = StyleSheet.create({
     container: {
@@ -75,7 +84,7 @@ export default function TopBar() {
   return (
     <View style={styles.container}>
       <View className="flex-row items-center w-11/12">
-        <View className="flex-row items-center p-2">
+        <View className="flex-row items-center p-2 pr-3">
           <Image
             source={require("../assets/dummyProfile.png")}
             alt="profile"
