@@ -12,14 +12,12 @@ import { useMapStore } from "../state/stores/mapStore";
 import { useUserStore } from "../state/stores/userStore";
 import { getPickups } from "../utils/db/map";
 import { LucideLocate, LucidePlus } from "lucide-react-native";
-import Geocoder from "react-native-geocoding";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
 import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
 
 export default function Map() {
-  Geocoder.init(`${GOOGLE_MAPS_API_KEY}`);
   const pickups = useMapStore((state) => state.pickups);
   const setPickups = useMapStore((state) => state.setPickups);
   const user = useUserStore((state) => state.user);
@@ -99,11 +97,27 @@ export default function Map() {
     );
   };
 
-  const renderMarkers = () => {
+  const renderPickupMarkers = () => {
     if (!pickups) return;
     return pickups.map((pickup) => (
       <PickupMarker pickup={pickup} key={pickup.id} />
     ));
+  };
+
+  const renderFoodMarkers = () => {
+    if (!user?.latitude || !user?.longitude) return;
+    return (
+      <Marker
+        key={user.id}
+        coordinate={{
+          latitude: user.latitude,
+          longitude: user.longitude,
+        }}
+        onPress={() => {}}
+        onDeselect={() => {}}
+        image={require("../assets/foodbank.png")}
+      />
+    );
   };
 
   const PickupMarker = ({ pickup }: { pickup: Pickup }) => {
@@ -167,7 +181,7 @@ export default function Map() {
           goToCurrentLocation();
         }}
       >
-        {myLocation && destination && (
+        {myLocation && destination && user?.type === "driver" && (
           <>
             <MapViewDirections
               origin={{
@@ -183,21 +197,24 @@ export default function Map() {
               strokeColor="red"
               mode={"TRANSIT"}
             />
-
-            <Marker
-              key={"user"}
-              coordinate={{
-                latitude: myLocation.latitude,
-                longitude: myLocation.longitude,
-              }}
-              onPress={() => {}}
-              onDeselect={() => {}}
-              image={require("../assets/you.png")}
-            />
           </>
         )}
 
-        {user?.type === "driver" && renderMarkers()}
+        {myLocation && (
+          <Marker
+            key={"user"}
+            coordinate={{
+              latitude: myLocation.latitude,
+              longitude: myLocation.longitude,
+            }}
+            onPress={() => {}}
+            onDeselect={() => {}}
+            image={require("../assets/you.png")}
+          />
+        )}
+
+        {user?.type === "driver" && renderPickupMarkers()}
+        {user?.type === "foodbank" && renderFoodMarkers()}
       </MapView>
       <TouchableOpacity
         onPress={goToCurrentLocation}

@@ -21,7 +21,6 @@ import {
   doesUserExistById,
   insertNewUser,
   signInUserWithToken,
-  updateUser,
 } from "../utils/db/auth";
 
 SplashScreen.preventAutoHideAsync();
@@ -85,6 +84,8 @@ export default function SignInPage() {
       if (!checkUser.type) {
         console.log("Redirecting to /onboarding");
         router.navigate("/onboarding");
+      } else if (checkUser.type === "foodbank" && !checkUser.latitude) {
+        router.navigate("/inputaddress");
       } else {
         console.log("Redirecting to /profile");
         router.navigate("/home");
