@@ -16,6 +16,7 @@ import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
 import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
+import { getDistance } from "geolib";
 
 export default function Map() {
   const pickups = useMapStore((state) => state.pickups);
@@ -23,7 +24,9 @@ export default function Map() {
   const user = useUserStore((state) => state.user);
   const destination = useMapStore((state) => state.destinationLocation);
   const setDestination = useMapStore((state) => state.setDestinationLocation);
-
+  const [travelInfo, setTravelInfo] = useState<{
+    distance: string;
+  } | null>(null);
   const [isDonateModalVisible, setIsDonateModalVisible] = useState(false);
   const initialLocation = {
     latitude: 39.75,
@@ -37,6 +40,7 @@ export default function Map() {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+  const setEstimatedTime = useMapStore((state) => state.setEstimatedTime);
   const mapRef = useRef<MapView>(null);
   const getCurrentLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -62,7 +66,24 @@ export default function Map() {
     }
   };
 
+  const updateTravelInfo = (result: any) => {
+    setTravelInfo({
+      distance: `${result.distance.toFixed(1)} miles`,
+    });
+    setEstimatedTime(formatDuration(result.duration));
+  };
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) {
+      return `${Math.round(minutes)} mins`;
+    }
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = Math.round(minutes % 60);
+    return `${hours}h ${remainingMinutes}m`;
+  };
+
   useEffect(() => {
+    console.log(myLocation);
     const loadPickups = async () => {
       const { data: pickups, error } = await getPickups();
       if (error) {
@@ -86,15 +107,6 @@ export default function Map() {
       };
       mapRef.current?.animateToRegion(newRegion);
     }
-  };
-
-  const InfoRow = ({ label, value }: { label: string; value: string }) => {
-    return (
-      <View className="flex-row justify-between items-center">
-        <Text className="text-sm font-semibold text-gray-600">{label}:</Text>
-        <Text className="text-sm font-bold text-gray-800">{value}</Text>
-      </View>
-    );
   };
 
   const renderPickupMarkers = () => {
@@ -121,6 +133,8 @@ export default function Map() {
   };
 
   const PickupMarker = ({ pickup }: { pickup: Pickup }) => {
+    if (!myLocation) return;
+
     return (
       <Marker
         key={pickup.id}
@@ -141,16 +155,7 @@ export default function Map() {
           }}
         >
           <View className="bg-white rounded-2xl overflow-hidden shadow-lg w-72">
-            <Text className=""></Text>
             <View className="p-4">
-              <Text className="text-2xl font-bold mb-3 text-center text-green-700">
-                {pickup.food_items.length}
-              </Text>
-              <View className="space-y-2">
-                <InfoRow label="Estimated Capacity" value={"0%"} />
-                <InfoRow label="Items Recycled" value={"0%"} />
-                <InfoRow label="Est. Weight Recycled" value={"0 kg"} />
-              </View>
               <View className="bg-green-600 py-3 px-4 rounded-xl mt-4 shadow-md">
                 <Text className="text-white font-bold text-center text-lg">
                   Start Pickup
@@ -196,6 +201,9 @@ export default function Map() {
               strokeWidth={4}
               strokeColor="red"
               mode={"TRANSIT"}
+              onReady={(result) => {
+                updateTravelInfo(result);
+              }}
             />
           </>
         )}
@@ -216,6 +224,13 @@ export default function Map() {
         {user?.type === "driver" && renderPickupMarkers()}
         {user?.type === "foodbank" && renderFoodMarkers()}
       </MapView>
+      {travelInfo && (
+        <View className="absolute top-4 left-4 bg-white p-4 rounded-xl shadow-lg">
+          <Text className="font-bold text-lg">Route Information</Text>
+          <Text className="text-gray-700">Distance: {travelInfo.distance}</Text>
+        </View>
+      )}
+
       <TouchableOpacity
         onPress={goToCurrentLocation}
         style={[styles.relocateButton, { borderColor: getThemeColor() }]}

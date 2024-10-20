@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo-google-fonts/inter": "^0.2.3",
+    "@googlemaps/react-native-navigation-sdk": "^0.6.1",
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-google-signin/google-signin": "^13.1.0",
     "@rneui/themed": "^4.0.0-rc.8",
@@ -26,6 +27,7 @@
     "expo-location": "^17.0.1",
     "expo-router": "~3.5.23",
     "expo-status-bar": "~1.12.1",
+    "geolib": "^3.3.4",
     "immer": "^10.1.1",
     "lucide-react": "^0.447.0",
     "lucide-react-native": "^0.453.0",

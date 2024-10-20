@@ -19,6 +19,9 @@ export const useMapStore = create<MapStore>(
         set({ currentLocation: location }),
       setDestinationLocation: (location: Location) =>
         set({ destinationLocation: location }),
+
+      estimatedTime: null,
+      setEstimatedTime: (time: number) => set({ estimatedTime: time }),
     })),
     {
       name: "map-storage",

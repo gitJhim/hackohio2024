@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useUserStore } from "../state/stores/userStore";
-import { Ionicons } from "@expo/vector-icons"; // Make sure to install @expo/vector-icons
+import { Ionicons } from "@expo/vector-icons";
+import { useMapStore } from "../state/stores/mapStore";
 
 interface TopBarProps {
   showButtons?: boolean;
@@ -10,6 +11,7 @@ interface TopBarProps {
 export default function TopBar({ showButtons = true }: TopBarProps) {
   const [activeButton, setActiveButton] = useState("Car");
   const user = useUserStore((state) => state.user);
+  const estimatedTime = useMapStore((state) => state.estimatedTime);
 
   if (!user) {
     showButtons = false;
@@ -48,8 +50,8 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
       borderRadius: 28,
       padding: 2,
       marginTop: 2,
-      width: '80%',
-      justifyContent: 'space-around'
+      width: "80%",
+      justifyContent: "space-around",
     },
     button: {
       flexDirection: "row",
@@ -113,7 +115,7 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
                 activeButton === "Car" && styles.activeButtonText,
               ]}
             >
-              4 min
+              {estimatedTime}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -147,4 +149,3 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
     </View>
   );
 }
-

@@ -22,7 +22,5 @@ export const getPickups = async () => {
     console.log(error);
   }
 
-  console.log(data);
-
   return { data: data as Pickup[], error };
 };

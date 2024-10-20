@@ -20,6 +20,7 @@ export type User = {
   type: UserType;
   latitude: number | null;
   longitude: number | null;
+  foodbank_name: string | null;
 };
 
 export type UserType = "driver" | "foodbank" | "donor";

@@ -106,7 +106,7 @@ const FoodbankAddressForm = () => {
       try {
         const lat = coords.results[0].geometry.location.lat;
         const lng = coords.results[0].geometry.location.lng;
-        await setFoodbankAddress(user.id, lat, lng);
+        await setFoodbankAddress(user.id, lat, lng, formData.organizationName);
         router.navigate("/home");
       } catch (error) {
         console.error("Error saving lat lng:", error);
