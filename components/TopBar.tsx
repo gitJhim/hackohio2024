@@ -48,7 +48,7 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
       borderRadius: 28,
       padding: 2,
       marginTop: 2,
-      width: '30%',
+      width: '80%',
       justifyContent: 'space-around'
     },
     button: {
