@@ -94,7 +94,7 @@ const Profile = () => {
   useEffect(() => {
     const loadRequests = async () => {
       if (!user || !user.id) return;
-      const requests = await getRequests(user?.id);
+      const requests = await getRequests();
       setRequests(requests.data);
     };
 
@@ -257,4 +257,3 @@ const Profile = () => {
 };
 
 export default Profile;
-
