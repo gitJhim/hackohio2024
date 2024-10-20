@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, View, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { useUserStore } from '../state/stores/userStore';
-import { Plus, Trash2, Edit2 } from 'lucide-react-native';
+import { Plus, Trash2, Edit2, Clock, CheckCircle } from 'lucide-react-native';
 
 interface RequestedItem {
   id: string;
   name: string;
   current: number;
   required: number;
+}
+
+interface Donation {
+  id: string;
+  items: string;
+  date: string;
+  status: 'pending' | 'complete'
+  
 }
 
 const Profile = () => {
@@ -20,6 +28,33 @@ const Profile = () => {
     { id: '3', name: 'Beans', current: 25, required: 75 },
   ]);
   const [editingItem, setEditingItem] = useState<string | null>(null);
+
+  const [donationHistory, setDonationHistory] = useState<Donation[]>([
+    { 
+      id: '1', 
+      items: 'Canned Goods (50), Rice (25kg), Pasta (30 boxes)', 
+      date: '2023-06-15', 
+      status: 'pending'
+    },
+    { 
+      id: '2', 
+      items: 'Fresh Vegetables (100lbs), Bread (50 loaves), Milk (20 gallons)', 
+      date: '2023-06-01', 
+      status: 'complete'
+    },
+    { 
+      id: '3', 
+      items: 'Baby Food (100 jars), Diapers (10 boxes), Baby Wipes (20 packs)', 
+      date: '2023-05-20', 
+      status: 'complete'
+    },
+    { 
+      id: '4', 
+      items: 'Hygiene Kits (50), Toothpaste (100 tubes), Soap (200 bars)', 
+      date: '2023-05-10', 
+      status: 'complete'
+    },
+  ]);
 
   const getHeaderColor = () => {
     switch (user?.type) {
@@ -101,6 +136,26 @@ const Profile = () => {
     </View>
   );
 
+  const renderDonationItem = ({ item }: { item: Donation }) => (
+    <View className="mb-4 p-4 bg-white rounded-lg shadow-md border-l-4 border-[#EF4444]">
+      <View className="flex-row justify-between items-center mb-2">
+        <Text className="text-lg font-bold text-red-600">Donation</Text>
+        <View className="flex-row items-center">
+          {item.status === 'pending' ? (
+            <Clock color="#EF4444" size={15} />
+          ) : (
+            <CheckCircle color="#10B981" size={15} />
+          )}
+          <Text className={`ml-1 ${item.status === 'pending' ? 'text-red-500' : 'text-green-500'}`}>
+            {item.status === 'pending' ? 'Pending' : 'Complete'}
+          </Text>
+        </View>
+      </View>
+      <Text className="text-sm text-gray-700 mt-1">{item.items}</Text>
+      <Text className="text-xs text-gray-500 mt-2">{item.date}</Text>
+    </View>
+  );
+
   return (
     <View className="flex-1 bg-gray-100">
       <ScrollView
@@ -178,7 +233,12 @@ const Profile = () => {
           {user?.type === 'donor' && (
             <View className="mt-4">
               <Text className="text-2xl font-bold mb-4 text-red-700">Donor Dashboard</Text>
-              {/* Add donor-specific content here */}
+              <FlatList
+                data={donationHistory}
+                renderItem={renderDonationItem}
+                keyExtractor={item => item.id}
+                scrollEnabled={false}
+              />
             </View>
           )}
 
