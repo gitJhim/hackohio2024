@@ -1,64 +1,67 @@
 import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   StyleSheet,
   Dimensions,
   Text,
   TouchableOpacity,
-  Button,
 } from "react-native";
 import * as Location from "expo-location";
 import { useMapStore } from "../state/stores/mapStore";
 import { useUserStore } from "../state/stores/userStore";
 import { getPickups } from "../utils/db/map";
-import { LucideLocate, LucidePlus, PackageOpen } from "lucide-react-native";
+import { LucideLocate, LucidePlus } from "lucide-react-native";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
 import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
-import { getDistance } from "geolib";
 import FoodRequestModal from "./RequestFoodModal";
 import { useRouter } from "expo-router";
 
 export default function Map() {
-  const pickups = useMapStore((state) => state.pickups);
-  const setPickups = useMapStore((state) => state.setPickups);
-  const user = useUserStore((state) => state.user);
-  const destination = useMapStore((state) => state.destinationLocation);
-  const setDestination = useMapStore((state) => state.setDestinationLocation);
-  const [travelInfo, setTravelInfo] = useState<{
-    distance: string;
-  } | null>(null);
+  const {
+    pickups,
+    setPickups,
+    destinationLocation: destination,
+    setDestinationLocation: setDestination,
+    setEstimatedTime,
+  } = useMapStore();
+  const { user } = useUserStore();
+  const [travelInfo, setTravelInfo] = useState<{ distance: string } | null>(
+    null,
+  );
   const [isDonateModalVisible, setIsDonateModalVisible] = useState(false);
   const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
+  const [myLocation, setMyLocation] =
+    useState<Location.LocationObjectCoords | null>(null);
 
   const initialLocation = {
     latitude: 39.75,
     longitude: -84.19,
-  };
-  const [myLocation, setMyLocation] =
-    useState<Location.LocationObjectCoords | null>(null);
-  const [region, setRegion] = useState({
-    latitude: initialLocation.latitude,
-    longitude: initialLocation.longitude,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
-  });
-  const setEstimatedTime = useMapStore((state) => state.setEstimatedTime);
-  const mapRef = useRef<MapView>(null);
-  const getCurrentLocation = async () => {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-
-    if (status !== "granted") {
-      console.warn("Permission to access location was denied");
-      return;
-    }
-    let location = await Location.getCurrentPositionAsync({});
-    setMyLocation(location.coords);
   };
 
-  const getThemeColor = () => {
+  const [region, setRegion] = useState(initialLocation);
+  const mapRef = useRef<MapView>(null);
+  const router = useRouter();
+
+  const getCurrentLocation = useCallback(async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        console.warn("Permission to access location was denied");
+        return;
+      }
+      const location = await Location.getCurrentPositionAsync({});
+      setMyLocation(location.coords);
+    } catch (error) {
+      console.error("Error getting location:", error);
+    }
+  }, []);
+
+  const getThemeColor = useCallback(() => {
     switch (user?.type) {
       case "driver":
         return "#17A773";
@@ -69,129 +72,118 @@ export default function Map() {
       default:
         return "#808080";
     }
-  };
+  }, [user?.type]);
 
-  const router = useRouter();
+  const updateTravelInfo = useCallback(
+    (result: any) => {
+      setTravelInfo({
+        distance: `${result.distance.toFixed(1)} miles`,
+      });
+      setEstimatedTime(formatDuration(result.duration));
+    },
+    [setEstimatedTime],
+  );
 
-  const onDelivered = async () => {
-    router.push("/delivered");
-  };
-
-  const updateTravelInfo = (result: any) => {
-    setTravelInfo({
-      distance: `${result.distance.toFixed(1)} miles`,
-    });
-    setEstimatedTime(formatDuration(result.duration));
-  };
-
-  const formatDuration = (minutes: number) => {
+  const formatDuration = useCallback((minutes: number) => {
     if (minutes < 60) {
       return `${Math.round(minutes)} mins`;
     }
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = Math.round(minutes % 60);
     return `${hours}h ${remainingMinutes}m`;
-  };
+  }, []);
+
+  const goToCurrentLocation = useCallback(() => {
+    if (myLocation && mapRef.current) {
+      mapRef.current.animateToRegion({
+        ...myLocation,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      });
+    }
+  }, [myLocation]);
 
   useEffect(() => {
-    console.log(myLocation);
     const loadPickups = async () => {
-      const { data: pickups, error } = await getPickups();
-      if (error) {
-        console.error("Error loading markers:", error.message);
-      } else {
-        setPickups(pickups);
+      try {
+        const { data, error } = await getPickups();
+        if (error) {
+          console.error("Error loading markers:", error.message);
+        } else {
+          setPickups(data);
+        }
+      } catch (error) {
+        console.error("Error in loadPickups:", error);
       }
     };
 
-    loadPickups();
-    getCurrentLocation();
-  }, []);
-
-  const goToCurrentLocation = () => {
-    if (myLocation) {
-      const newRegion = {
-        latitude: myLocation.latitude,
-        longitude: myLocation.longitude,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      };
-      mapRef.current?.animateToRegion(newRegion);
+    if (user?.type === "driver") {
+      loadPickups();
     }
-  };
+    getCurrentLocation();
+  }, [getCurrentLocation, setPickups, user?.type]);
 
-  const renderPickupMarkers = () => {
-    if (!pickups) return;
+  const PickupMarker = useCallback(
+    ({ pickup }: { pickup: Pickup }) => {
+      if (!myLocation) return null;
+
+      return (
+        <Marker
+          key={pickup.id}
+          coordinate={{
+            latitude: pickup.latitude,
+            longitude: pickup.longitude,
+          }}
+          image={require("../assets/package.png")}
+        >
+          <Callout
+            onPress={() => {
+              setDestination({
+                latitude: pickup.latitude,
+                longitude: pickup.longitude,
+              });
+            }}
+          >
+            <View className="bg-white rounded-2xl overflow-hidden shadow-lg w-72">
+              <View className="p-4">
+                <View className="bg-green-600 py-3 px-4 rounded-xl mt-4 shadow-md">
+                  <Text className="text-white font-bold text-center text-lg">
+                    Start Pickup
+                  </Text>
+                </View>
+              </View>
+            </View>
+          </Callout>
+        </Marker>
+      );
+    },
+    [myLocation, setDestination],
+  );
+
+  const renderPickupMarkers = useCallback(() => {
+    if (!pickups) return null;
     return pickups.map((pickup) => (
       <PickupMarker pickup={pickup} key={pickup.id} />
     ));
-  };
+  }, [pickups, PickupMarker]);
 
-  const renderFoodMarkers = () => {
-    if (!user?.latitude || !user?.longitude) return;
-    return (
-      <Marker
-        key={user.id}
-        coordinate={{
-          latitude: user.latitude,
-          longitude: user.longitude,
-        }}
-        onPress={() => {}}
-        onDeselect={() => {}}
-        image={require("../assets/foodbank.png")}
-      />
-    );
-  };
-
-  const PickupMarker = ({ pickup }: { pickup: Pickup }) => {
-    if (!myLocation) return;
-
-    return (
-      <Marker
-        key={pickup.id}
-        coordinate={{
-          latitude: pickup.latitude,
-          longitude: pickup.longitude,
-        }}
-        onPress={() => {}}
-        onDeselect={() => {}}
-        image={require("../assets/package.png")}
-      >
-        <Callout
-          onPress={() => {
-            setDestination({
-              latitude: pickup.latitude,
-              longitude: pickup.longitude,
-            });
-          }}
-        >
-          <View className="bg-white rounded-2xl overflow-hidden shadow-lg w-72">
-            <View className="p-4">
-              <View className="bg-green-600 py-3 px-4 rounded-xl mt-4 shadow-md">
-                <Text className="text-white font-bold text-center text-lg">
-                  Start Pickup
-                </Text>
-              </View>
-            </View>
-          </View>
-        </Callout>
-      </Marker>
-    );
-  };
   return (
     <View className="flex flex-col justify-center items-center">
-      <DonateFoodModal
-        setModalVisible={setIsDonateModalVisible}
-        isModalVisible={isDonateModalVisible}
-        latitude={myLocation?.latitude}
-        longitude={myLocation?.longitude}
-      />
-      <FoodRequestModal
-        setModalVisible={setIsRequestModalVisible}
-        isModalVisible={isRequestModalVisible}
-        latitude={myLocation?.latitude}
-        longitude={myLocation?.longitude}
-      />
+      {user?.type === "donor" && (
+        <DonateFoodModal
+          setModalVisible={setIsDonateModalVisible}
+          isModalVisible={isDonateModalVisible}
+          latitude={myLocation?.latitude}
+          longitude={myLocation?.longitude}
+        />
+      )}
+
+      {user?.type === "foodbank" && (
+        <FoodRequestModal
+          setModalVisible={setIsRequestModalVisible}
+          isModalVisible={isRequestModalVisible}
+        />
+      )}
 
       <MapView
         style={styles.map}
@@ -199,62 +191,56 @@ export default function Map() {
         onRegionChangeComplete={setRegion}
         ref={mapRef}
         provider={PROVIDER_GOOGLE}
-        onMapReady={() => {
-          getCurrentLocation();
-          goToCurrentLocation();
-        }}
+        onMapReady={goToCurrentLocation}
       >
         {myLocation && destination && user?.type === "driver" && (
-          <>
-            <MapViewDirections
-              origin={{
-                latitude: myLocation.latitude,
-                longitude: myLocation.longitude,
-              }}
-              destination={{
-                latitude: destination.latitude,
-                longitude: destination.longitude,
-              }}
-              apikey={`${GOOGLE_MAPS_API_KEY}`}
-              strokeWidth={4}
-              strokeColor="red"
-              mode={"TRANSIT"}
-              onReady={(result) => {
-                updateTravelInfo(result);
-              }}
-            />
-          </>
+          <MapViewDirections
+            origin={{
+              latitude: myLocation.latitude,
+              longitude: myLocation.longitude,
+            }}
+            destination={{
+              latitude: destination.latitude,
+              longitude: destination.longitude,
+            }}
+            apikey={GOOGLE_MAPS_API_KEY}
+            strokeWidth={4}
+            strokeColor="red"
+            mode="TRANSIT"
+            onReady={updateTravelInfo}
+          />
         )}
 
         {myLocation && (
           <Marker
-            key={"user"}
+            key="user"
             coordinate={{
               latitude: myLocation.latitude,
               longitude: myLocation.longitude,
             }}
-            onPress={() => {}}
-            onDeselect={() => {}}
             image={require("../assets/you.png")}
           />
         )}
 
         {user?.type === "driver" && renderPickupMarkers()}
-        {user?.type === "foodbank" && renderFoodMarkers()}
       </MapView>
-      {travelInfo && (
+
+      {user?.type === "driver" && travelInfo && (
         <View className="absolute top-4 left-4 bg-white p-4 rounded-xl shadow-lg">
           <Text className="font-bold text-lg">Route Information</Text>
           <Text className="text-gray-700">Distance: {travelInfo.distance}</Text>
         </View>
       )}
 
-      <TouchableOpacity
-        onPress={goToCurrentLocation}
-        style={[styles.relocateButton, { borderColor: getThemeColor() }]}
-      >
-        <LucideLocate size={24} color={getThemeColor()} />
-      </TouchableOpacity>
+      {user?.type === "driver" && (
+        <TouchableOpacity
+          onPress={goToCurrentLocation}
+          style={[styles.relocateButton, { borderColor: getThemeColor() }]}
+        >
+          <LucideLocate size={24} color={getThemeColor()} />
+        </TouchableOpacity>
+      )}
+
       {user?.type === "donor" && (
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: getThemeColor() }]}
@@ -263,6 +249,7 @@ export default function Map() {
           <LucidePlus size={24} color="#fff" />
         </TouchableOpacity>
       )}
+
       {user?.type === "foodbank" && (
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: getThemeColor() }]}
@@ -276,12 +263,6 @@ export default function Map() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
   map: {
     width: Dimensions.get("window").width,
     height: Dimensions.get("window").height,
@@ -290,7 +271,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: Dimensions.get("window").height * 0.18,
     right: Dimensions.get("window").width * 0.05,
-    backgroundColor: "#8B5CF6",
     padding: 16,
     borderRadius: 24,
   },
