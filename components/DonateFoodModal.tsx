@@ -32,7 +32,7 @@ const FoodImageModal = ({
     setModalVisible();
   };
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset>();
-  const { foodNames, analyzeImageWithFoodvisor, loading, error } =
+  const { sumWeight, foodNames, analyzeImageWithFoodvisor, loading, error } =
     useFoodvisor();
   const [foodList, setFoodList] = useState<string[]>([]);
   const [newItem, setNewItem] = useState("");
