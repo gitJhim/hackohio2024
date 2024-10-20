@@ -23,6 +23,8 @@ export default function Map() {
   const pickups = useMapStore((state) => state.pickups);
   const setPickups = useMapStore((state) => state.setPickups);
   const user = useUserStore((state) => state.user);
+  const destination = useMapStore((state) => state.destinationLocation);
+  const setDestination = useMapStore((state) => state.setDestinationLocation);
 
   const [isDonateModalVisible, setIsDonateModalVisible] = useState(false);
   const initialLocation = {
@@ -116,7 +118,14 @@ export default function Map() {
         onDeselect={() => {}}
         image={require("../assets/package.png")}
       >
-        <Callout onPress={() => {}}>
+        <Callout
+          onPress={() => {
+            setDestination({
+              latitude: pickup.latitude,
+              longitude: pickup.longitude,
+            });
+          }}
+        >
           <View className="bg-white rounded-2xl overflow-hidden shadow-lg w-72">
             <Text className=""></Text>
             <View className="p-4">
@@ -158,7 +167,7 @@ export default function Map() {
           goToCurrentLocation();
         }}
       >
-        {myLocation && (
+        {myLocation && destination && (
           <>
             <MapViewDirections
               origin={{
@@ -166,8 +175,8 @@ export default function Map() {
                 longitude: myLocation.longitude,
               }}
               destination={{
-                latitude: pickups[0].latitude,
-                longitude: pickups[0].longitude,
+                latitude: destination.latitude,
+                longitude: destination.longitude,
               }}
               apikey={`${GOOGLE_MAPS_API_KEY}`}
               strokeWidth={4}
@@ -188,7 +197,7 @@ export default function Map() {
           </>
         )}
 
-        {renderMarkers()}
+        {user?.type === "driver" && renderMarkers()}
       </MapView>
       <TouchableOpacity
         onPress={goToCurrentLocation}
@@ -196,12 +205,14 @@ export default function Map() {
       >
         <LucideLocate size={24} color={getThemeColor()} />
       </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.addButton, { backgroundColor: getThemeColor() }]}
-        onPress={() => setIsDonateModalVisible(true)}
-      >
-        <LucidePlus size={24} color="#fff" />
-      </TouchableOpacity>
+      {user?.type === "donor" && (
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: getThemeColor() }]}
+          onPress={() => setIsDonateModalVisible(true)}
+        >
+          <LucidePlus size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
