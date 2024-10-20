@@ -24,4 +24,6 @@ export type Pickup = {
   latitude: number;
   longitude: number;
   food_items: string[];
+  status: "pending" | "completed";
+  created_at?: string | null;
 };
