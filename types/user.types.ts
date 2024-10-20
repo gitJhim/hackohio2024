@@ -18,6 +18,9 @@ export type User = {
   avatar_url: string | null;
   last_sign_in: string | null;
   type: UserType;
+  latitude: number | null;
+  longitude: number | null;
+  foodbank_name: string | null;
 };
 
 export type UserType = "driver" | "foodbank" | "donor";

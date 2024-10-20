@@ -1,32 +1,48 @@
 import { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, Image, FlatList, TextInput} from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  FlatList,
+  TextInput,
+} from "react-native";
 import Modal from "react-native-modal";
 import { Camera, Trash2 } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useFoodvisor } from "../hooks/useFoodvisor";
+import { useUserStore } from "../state/stores/userStore";
+import { Pickup } from "../types/map.types";
+import { addPickup } from "../utils/db/map";
+import uuid from "react-native-uuid";
 
 const FoodImageModal = ({
   setModalVisible,
   isModalVisible,
+  latitude,
+  longitude,
 }: {
-  setModalVisible: () => void;
+  setModalVisible: any;
   isModalVisible: boolean;
+  latitude: number | undefined;
+  longitude: number | undefined;
 }) => {
+  const user = useUserStore((state) => state.user);
   const toggleModal = () => {
     setModalVisible();
   };
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset>();
   const { foodNames, analyzeImageWithFoodvisor, loading, error } =
     useFoodvisor();
-  const [foodList, setFoodList] = useState<string[]>([])
+  const [foodList, setFoodList] = useState<string[]>([]);
   const [newItem, setNewItem] = useState("");
 
   useEffect(() => {
-setFoodList(foodNames)
+    setFoodList(foodNames);
   }, [foodNames]);
 
   const addItem = () => {
-    if (newItem.trim()){
+    if (newItem.trim()) {
       setFoodList([...foodList, newItem.trim()]);
       setNewItem("");
     }
@@ -36,14 +52,11 @@ setFoodList(foodNames)
     setFoodList(foodList.filter((_, i) => i !== index));
   };
 
-
-
   const processImage = async (result: ImagePicker.ImagePickerResult) => {
     if (!result.canceled) {
       setImage(result.assets[0]);
       await analyzeImageWithFoodvisor(result.assets[0].uri);
     }
-    console.log("processed: ", foodNames)
   };
 
   const pickImage = async () => {
@@ -71,8 +84,20 @@ setFoodList(foodNames)
     }
   };
 
-  const handleSubmit = () => {
-    // Handle submit logic here
+  const handleSubmit = async () => {
+    if (!user || !user.id) return;
+    if (!latitude || !longitude) return;
+
+    const pickup: Pickup = {
+      id: uuid.v4().toString(),
+      user_id: user.id,
+      latitude: latitude,
+      longitude: longitude,
+      food_items: foodNames,
+    };
+
+    await addPickup(pickup);
+
     toggleModal();
   };
 
@@ -152,45 +177,46 @@ setFoodList(foodNames)
             )}
 
             {(image || foodList.length > 0) && (
-            <>
-              <View className="mt-4 mb-4">
-                <Text className="font-bold text-lg mb-2 text-gray-800">
-                  Detected Foods:
-                </Text>
-                <View className="bg-gray-50 rounded-lg p-3 max-h-32">
-                  <FlatList
-                    data={foodList}
-                    renderItem={({ item, index }) => (
-                      <View className="flex-row justify-between items-center mb-1">
-                      <Text className="text-base text-gray-700">• {item}</Text>
-                      <TouchableOpacity onPress={() => deleteItem(index)}>
-                        <Trash2 color="red" size={20} />
-                      </TouchableOpacity>
-                    </View>
-                    )}
-                    keyExtractor={(item, index) => index.toString()}
-                  />
+              <>
+                <View className="mt-4 mb-4">
+                  <Text className="font-bold text-lg mb-2 text-gray-800">
+                    Detected Foods:
+                  </Text>
+                  <View className="bg-gray-50 rounded-lg p-3 max-h-32">
+                    <FlatList
+                      data={foodList}
+                      renderItem={({ item, index }) => (
+                        <View className="flex-row justify-between items-center mb-1">
+                          <Text className="text-base text-gray-700">
+                            • {item}
+                          </Text>
+                          <TouchableOpacity onPress={() => deleteItem(index)}>
+                            <Trash2 color="red" size={20} />
+                          </TouchableOpacity>
+                        </View>
+                      )}
+                      keyExtractor={(item, index) => index.toString()}
+                    />
+                  </View>
                 </View>
-              </View>
 
-              {/* Manual Item Addition */}
-              <View className="flex-row mt-2">
-                <TextInput
-                  className="flex-1 border border-gray-300 rounded-l-lg p-2"
-                  value={newItem}
-                  onChangeText={setNewItem}
-                  placeholder="Add item manually"
-                />
-                <TouchableOpacity
-                  onPress={addItem}
-                  className="bg-red-600 rounded-r-lg p-2 justify-center"
-                >
-                  <Text className="text-white font-bold">Add</Text>
-                </TouchableOpacity>
-              </View>
-            </>
+                {/* Manual Item Addition */}
+                <View className="flex-row mt-2">
+                  <TextInput
+                    className="flex-1 border border-gray-300 rounded-l-lg p-2"
+                    value={newItem}
+                    onChangeText={setNewItem}
+                    placeholder="Add item manually"
+                  />
+                  <TouchableOpacity
+                    onPress={addItem}
+                    className="bg-red-600 rounded-r-lg p-2 justify-center"
+                  >
+                    <Text className="text-white font-bold">Add</Text>
+                  </TouchableOpacity>
+                </View>
+              </>
             )}
-
 
             {/* Submit Button */}
             <TouchableOpacity

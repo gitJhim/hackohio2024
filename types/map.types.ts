@@ -8,6 +8,9 @@ export type MapStore = {
   destinationLocation: Location | null;
   setCurrentLocation: (location: Location) => void;
   setDestinationLocation: (location: Location) => void;
+
+  estimatedTime: string | null;
+  setEstimatedTime: (time: string) => void;
 };
 
 export type Location = {
@@ -16,8 +19,9 @@ export type Location = {
 };
 
 export type Pickup = {
-  id: string;
-  title: string;
+  id: string | null;
+  user_id: string;
   latitude: number;
   longitude: number;
+  food_items: string[];
 };
