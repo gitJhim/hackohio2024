@@ -6,18 +6,20 @@ import {
   Dimensions,
   Text,
   TouchableOpacity,
+  Button
 } from "react-native";
 import * as Location from "expo-location";
 import { useMapStore } from "../state/stores/mapStore";
 import { useUserStore } from "../state/stores/userStore";
 import { getPickups } from "../utils/db/map";
-import { LucideLocate, LucidePlus } from "lucide-react-native";
+import { LucideLocate, LucidePlus, PackageOpen } from "lucide-react-native";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
 import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
 import { getDistance } from "geolib";
 import { useRouter } from "expo-router"; 
+import Toast from 'react-native-toast-message';
 
 export default function Map() {
   const pickups = useMapStore((state) => state.pickups);
@@ -256,7 +258,7 @@ export default function Map() {
           style={[styles.addButton, {backgroundColor: getThemeColor() }]}
           onPress={() => onDelivered()}
         >
-          <LucidePlus size={24} color="#fff" />
+          <PackageOpen size={24} color="#fff" />
         </TouchableOpacity>
       )}
     </View>

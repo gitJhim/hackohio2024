@@ -3,6 +3,7 @@ import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useUserStore } from "../state/stores/userStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useMapStore } from "../state/stores/mapStore";
+import Toast from "react-native-toast-message";
 
 interface TopBarProps {
   showButtons?: boolean;
@@ -36,6 +37,14 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
 
   const themeColor = getThemeColor();
   const buttonColor = getButtonColor();
+
+  const showToast = () => {
+    Toast.show({
+      type: 'success',
+      text1: '',
+      text2: ''
+    });
+  }
 
   const styles = StyleSheet.create({
     container: {
