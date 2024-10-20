@@ -6,7 +6,7 @@ import {
   Dimensions,
   Text,
   TouchableOpacity,
-  Button
+  Button,
 } from "react-native";
 import * as Location from "expo-location";
 import { useMapStore } from "../state/stores/mapStore";
@@ -18,8 +18,8 @@ import { Pickup } from "../types/map.types";
 import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
 import { getDistance } from "geolib";
-import { useRouter } from "expo-router"; 
-import Toast from 'react-native-toast-message';
+import FoodRequestModal from "./RequestFoodModal";
+import { useRouter } from "expo-router";
 
 export default function Map() {
   const pickups = useMapStore((state) => state.pickups);
@@ -31,6 +31,8 @@ export default function Map() {
     distance: string;
   } | null>(null);
   const [isDonateModalVisible, setIsDonateModalVisible] = useState(false);
+  const [isRequestModalVisible, setIsRequestModalVisible] = useState(false);
+
   const initialLocation = {
     latitude: 39.75,
     longitude: -84.19,
@@ -70,9 +72,10 @@ export default function Map() {
   };
 
   const router = useRouter();
+
   const onDelivered = async () => {
     router.push("/delivered");
-  }
+  };
 
   const updateTravelInfo = (result: any) => {
     setTravelInfo({
@@ -183,6 +186,13 @@ export default function Map() {
         latitude={myLocation?.latitude}
         longitude={myLocation?.longitude}
       />
+      <FoodRequestModal
+        setModalVisible={setIsRequestModalVisible}
+        isModalVisible={isRequestModalVisible}
+        latitude={myLocation?.latitude}
+        longitude={myLocation?.longitude}
+      />
+
       <MapView
         style={styles.map}
         region={region}
@@ -253,12 +263,12 @@ export default function Map() {
           <LucidePlus size={24} color="#fff" />
         </TouchableOpacity>
       )}
-      {user?.type === "driver" && (
+      {user?.type === "foodbank" && (
         <TouchableOpacity
-          style={[styles.addButton, {backgroundColor: getThemeColor() }]}
-          onPress={() => onDelivered()}
+          style={[styles.addButton, { backgroundColor: getThemeColor() }]}
+          onPress={() => setIsRequestModalVisible(true)}
         >
-          <PackageOpen size={24} color="#fff" />
+          <LucidePlus size={24} color="#fff" />
         </TouchableOpacity>
       )}
     </View>

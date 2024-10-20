@@ -2,6 +2,7 @@ import { Session } from "@supabase/supabase-js";
 import { supabase } from "../supabase";
 import { useUserStore } from "../../state/stores/userStore";
 import { Event, User } from "../../types/user.types";
+import { Pickup } from "../../types/map.types";
 
 export const insertNewUser = async (session: Session) => {
   const { data, error } = await supabase
@@ -85,6 +86,42 @@ export const setFoodbankAddress = async (
     .select("*");
 
   return { user: data, error };
+};
+
+export const getUserPickups = async (userId: string) => {
+  const { data, error } = await supabase
+    .from("pickups")
+    .select("*")
+    .eq("user_id", userId);
+
+  if (error) {
+    console.log(error);
+  }
+
+  return { data: data as Pickup[], error };
+};
+
+export const setPickupStatus = async (
+  userId: string,
+  pickupId: string,
+  status: string,
+) => {
+  const { data, error } = await supabase
+    .from("pickups")
+    .update({
+      status: status,
+    })
+    .eq("user_id", userId)
+    .eq("id", pickupId)
+    .select("*");
+
+  return { data, error };
+};
+
+export const getAllUsers = async () => {
+  const { data, error } = await supabase.from("users").select("*");
+
+  return { data, error };
 };
 
 export const loadLogs = async (userId: string) => {

@@ -138,10 +138,10 @@ export default function SignInPage() {
       ) : (
         <View
           onLayout={onLayoutRootView}
-          className="flex-1 items-center justify-center bg-lightBackground dark:bg-darkBackground p-4"
+          className="flex-1 items-center justify-center bg-[#9E9885] p-4"
         >
           <Image
-            source={require("../assets/food.jpg")}
+            source={require("../assets/logo.png")}
             style={{
               width: Dimensions.get("window").width * 0.5,
               height: Dimensions.get("window").width * 0.5 * 0.8, // Adjust the aspect ratio accordingly
@@ -189,7 +189,7 @@ export default function SignInPage() {
                 }
               }
             }}
-            className="w-4/5 h-12 mb-4 flex-row items-center justify-center bg-[#4285F4] rounded-lg"
+            className="w-4/5 h-12 mb-4 flex-row items-center justify-center bg-[#BA3F1D] rounded-lg"
           >
             <Ionicons name="logo-google" size={24} color="white" />
             <Text className="text-white text-lg ml-2">Sign in with Google</Text>

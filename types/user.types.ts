@@ -1,4 +1,5 @@
 import { Session } from "@supabase/supabase-js";
+import { Pickup } from "./map.types";
 export type UserStore = {
   user: User | null;
   setUser: (user: User) => void;
@@ -9,6 +10,14 @@ export type UserStore = {
 
   session: Session | null;
   setSession: (session: Session | null) => void;
+
+  pickups: Pickup[];
+  addNewPickup: (pickup: Pickup) => void;
+  setPickups: (pickups: Pickup[]) => void;
+
+  requests: Request[];
+  addNewRequest: (request: Request) => void;
+  setRequests: (requests: Request[]) => void;
 };
 
 export type User = {

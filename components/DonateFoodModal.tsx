@@ -28,6 +28,7 @@ const FoodImageModal = ({
   longitude: number | undefined;
 }) => {
   const user = useUserStore((state) => state.user);
+  const addNewPickup = useUserStore((state) => state.addNewPickup);
   const toggleModal = () => {
     setModalVisible();
   };
@@ -93,11 +94,12 @@ const FoodImageModal = ({
       user_id: user.id,
       latitude: latitude,
       longitude: longitude,
-      food_items: foodNames,
+      food_items: foodList,
+      status: "pending",
     };
 
     await addPickup(pickup);
-
+    addNewPickup(pickup);
     toggleModal();
   };
 

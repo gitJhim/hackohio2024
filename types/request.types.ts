@@ -10,10 +10,13 @@ export type RequestStore = {
 export type Request = {
   id: string;
   user_id: string;
-  created_at: string;
+  created_at?: string;
+  food_item: string;
+  current: number;
+  required: number;
 };
 
-export type FoodItem = {
-  id: string;
+export type FoodBank = {
   name: string;
+  requestedItems: Request[];
 };
