@@ -87,7 +87,6 @@ export default function SignInPage() {
       } else if (checkUser.type === "foodbank" && !checkUser.latitude) {
         router.navigate("/inputaddress");
       } else {
-        console.log("Redirecting to /profile");
         router.navigate("/home");
       }
     } catch (error: any) {

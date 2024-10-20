@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Image, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useUserStore } from "../state/stores/userStore";
 import { Ionicons } from "@expo/vector-icons";
@@ -11,9 +11,11 @@ export default function TopBar() {
   const user = useUserStore((state) => state.user);
   const estimatedTime = useMapStore((state) => state.estimatedTime);
 
-  if (user?.type === "driver") {
-    setShowButtons(true);
-  }
+  useEffect(() => {
+    if (user?.type === "driver") {
+      setShowButtons(true);
+    }
+  }, [user?.type]);
 
   const getThemeColor = (): string => {
     switch (user?.type) {
@@ -37,11 +39,11 @@ export default function TopBar() {
 
   const showToast = () => {
     Toast.show({
-      type: 'success',
-      text1: '',
-      text2: ''
+      type: "success",
+      text1: "",
+      text2: "",
     });
-  }
+  };
 
   const styles = StyleSheet.create({
     container: {
