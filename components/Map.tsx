@@ -11,13 +11,14 @@ import * as Location from "expo-location";
 import { useMapStore } from "../state/stores/mapStore";
 import { useUserStore } from "../state/stores/userStore";
 import { getPickups } from "../utils/db/map";
-import { LucideLocate, LucidePlus } from "lucide-react-native";
+import { LucideLocate, LucidePlus, PackageOpen } from "lucide-react-native";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
 import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
 import FoodRequestModal from "./RequestFoodModal";
 import { useRouter } from "expo-router";
+
 
 export default function Map() {
   const {
@@ -167,6 +168,10 @@ export default function Map() {
     ));
   }, [pickups, PickupMarker]);
 
+  const onDelivered = async () => {
+    router.push("/delivered");
+}
+
   return (
     <View className="flex flex-col justify-center items-center">
       {user?.type === "donor" && (
@@ -241,6 +246,14 @@ export default function Map() {
         </TouchableOpacity>
       )}
 
+      {user?.type === "driver" && (
+        <TouchableOpacity
+          style={[styles.addButton, {backgroundColor: getThemeColor() }]}
+          onPress={() => onDelivered()}
+        >
+          <PackageOpen size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
       {user?.type === "donor" && (
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: getThemeColor() }]}
