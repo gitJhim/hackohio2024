@@ -101,6 +101,23 @@ export const getUserPickups = async (userId: string) => {
   return { data: data as Pickup[], error };
 };
 
+export const setPickupStatus = async (
+  userId: string,
+  pickupId: string,
+  status: string,
+) => {
+  const { data, error } = await supabase
+    .from("pickups")
+    .update({
+      status: status,
+    })
+    .eq("user_id", userId)
+    .eq("id", pickupId)
+    .select("*");
+
+  return { data, error };
+};
+
 export const loadLogs = async (userId: string) => {
   const { data, error } = await supabase
     .from("logs")
