@@ -81,7 +81,7 @@ const Profile = () => {
             keyboardType="numeric"
             onChangeText={(text) => item.required = parseInt(text, 10)}
           />
-          <TouchableOpacity onPress={() => saveEdit(item.id, item.current.toString(), item.required.toString())}>
+          <TouchableOpacity className="ml-auto m-3" onPress={() => saveEdit(item.id, item.current.toString(), item.required.toString())}>
             <Text className="text-purple-600 font-bold">Save</Text>
           </TouchableOpacity>
         </View>
