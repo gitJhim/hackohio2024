@@ -10,12 +10,14 @@ import {
 import { useUserStore } from "../state/stores/userStore";
 import { useRouter } from "expo-router";
 import { Star, Package } from "lucide-react-native";
+import { useMapStore } from "../state/stores/mapStore";
 
 const NUM_STARS = 5;
 
 const DeliveredScreen = () => {
   const router = useRouter();
   const user = useUserStore((state) => state.user);
+  const selectedPickup = useMapStore((state) => state.selectedPickup);
   const scaleAnim = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -83,7 +85,7 @@ const DeliveredScreen = () => {
           duration: 2000,
           easing: Easing.linear,
           useNativeDriver: true,
-        })
+        }),
       ),
       Animated.loop(
         Animated.sequence([
@@ -99,7 +101,7 @@ const DeliveredScreen = () => {
             easing: Easing.inOut(Easing.ease),
             useNativeDriver: true,
           }),
-        ])
+        ]),
       ),
       Animated.sequence([
         Animated.delay(500),
@@ -113,12 +115,10 @@ const DeliveredScreen = () => {
       ...starAnimations,
     ]).start();
 
-    // Set a timeout to navigate back after 4 seconds
     const timer = setTimeout(() => {
-      router.push('/request');
+      router.push("/profile");
     }, 4000);
 
-    // Clean up the timer if the component unmounts
     return () => clearTimeout(timer);
   }, []);
 
@@ -157,10 +157,7 @@ const DeliveredScreen = () => {
             style={[
               styles.levelUpImage,
               {
-                transform: [
-                  { rotate: logoSpin },
-                  { scale: logoPulsateAnim },
-                ],
+                transform: [{ rotate: logoSpin }, { scale: logoPulsateAnim }],
               },
             ]}
           />
@@ -199,9 +196,9 @@ const DeliveredScreen = () => {
             <Package size={24} color="#4A90E2" style={styles.cardIcon} />
             <View>
               <Text style={styles.cardTitle}>Package Info</Text>
-              <Text style={styles.cardText}>Item: Electronics</Text>
-              <Text style={styles.cardText}>Weight: 2.5 kg</Text>
-              <Text style={styles.cardText}>Recipient: John Doe</Text>
+              <Text style={styles.cardText}>Donation</Text>
+              <Text style={styles.cardText}>weight: 2.5 kg</Text>
+              <Text style={styles.cardText}>{selectedPickup?.food_items}</Text>
             </View>
           </View>
         </Animated.View>
@@ -241,7 +238,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   star: {
-    position: 'absolute',
+    position: "absolute",
   },
   card: {
     backgroundColor: "rgba(255, 255, 255, 0.9)",
@@ -275,3 +272,4 @@ const styles = StyleSheet.create({
 });
 
 export default DeliveredScreen;
+

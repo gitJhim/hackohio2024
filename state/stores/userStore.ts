@@ -5,6 +5,7 @@ import { immer } from "zustand/middleware/immer";
 import { UserStore } from "../../types/user.types";
 import { Event } from "../../types/user.types";
 import { Pickup } from "../../types/map.types";
+import { Delivery } from "../../types/deliveries.types";
 
 export const useUserStore = create<UserStore>(
   persist(
@@ -14,6 +15,7 @@ export const useUserStore = create<UserStore>(
       session: null,
       pickups: [],
       requests: [],
+      deliveries: [],
 
       setLogs: (logs: Event[]) => set({ logs }),
       addLog: (log: Event) =>
@@ -31,6 +33,11 @@ export const useUserStore = create<UserStore>(
       addNewRequest: (request: Request) =>
         set((state: { requests: Request[] }) => {
           [...state.requests, request];
+        }),
+      setDeliveries: (deliveries: Delivery[]) => set({ deliveries }),
+      addNewDelivery: (delivery: Delivery) =>
+        set((state: { deliveries: Delivery[] }) => {
+          [...state.deliveries, delivery];
         }),
     })),
     {

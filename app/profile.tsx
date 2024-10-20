@@ -20,6 +20,7 @@ import {
 import { Pickup } from "../types/map.types";
 import { Request } from "../types/request.types";
 import { getRequests } from "../utils/db/requests";
+import { getDeliveries } from "../utils/db/deliveries";
 interface Delivery {
   id: string;
   route: string;
@@ -33,37 +34,8 @@ const Profile = () => {
   const pickups = useUserStore((state) => state.pickups);
   const requests = useUserStore((state) => state.requests);
   const setRequests = useUserStore((state) => state.setRequests);
-
-  const [deliveryHistory, setDeliveryHistory] = useState<Delivery[]>([
-    {
-      id: "1",
-      route: "Downtown Food Bank to Westside Community Center",
-      items: "Non-perishables (500lbs), Fresh Produce (200lbs)",
-      date: "2023-06-18",
-      status: "in-progress",
-    },
-    {
-      id: "2",
-      route: "Central Warehouse to Northside Shelter",
-      items: "Canned Goods (300 units), Hygiene Kits (100)",
-      date: "2023-06-15",
-      status: "completed",
-    },
-    {
-      id: "3",
-      route: "Grocery Partner to Eastside Food Bank",
-      items: "Fresh Dairy (100 gallons), Bread (200 loaves)",
-      date: "2023-06-12",
-      status: "completed",
-    },
-    {
-      id: "4",
-      route: "Restaurant Donor to Southside Community Kitchen",
-      items: "Prepared Meals (150 servings)",
-      date: "2023-06-10",
-      status: "completed",
-    },
-  ]);
+  const deliveries = useUserStore((state) => state.deliveries);
+  const setDeliveries = useUserStore((state) => state.setDeliveries);
 
   const getHeaderColor = () => {
     switch (user?.type) {
@@ -92,13 +64,15 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    const loadRequests = async () => {
+    const loadData = async () => {
       if (!user || !user.id) return;
       const requests = await getRequests();
+      const deliveries = await getDeliveries();
       setRequests(requests.data);
+      setDeliveries(deliveries.data);
     };
 
-    loadRequests();
+    loadData();
   }, []);
   const renderRequestedItem = ({ item }: { item: Request }) => (
     <View className="mb-4 p-4 bg-white rounded-lg shadow-md">
@@ -165,7 +139,7 @@ const Profile = () => {
         {item.route}
       </Text>
       <Text className="text-sm text-gray-600 mt-1">{item.items}</Text>
-      <Text className="text-xs text-gray-500 mt-2">{item.date}</Text>
+      <Text className="text-xs text-gray-500 mt-2">{item.created_at}</Text>
     </View>
   );
 
@@ -243,7 +217,7 @@ const Profile = () => {
                 Driver Dashboard
               </Text>
               <FlatList
-                data={deliveryHistory}
+                data={deliveries}
                 renderItem={renderDeliveryItem}
                 keyExtractor={(item) => item.id}
                 scrollEnabled={false}

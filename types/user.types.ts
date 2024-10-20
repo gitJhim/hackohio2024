@@ -1,5 +1,6 @@
 import { Session } from "@supabase/supabase-js";
 import { Pickup } from "./map.types";
+import { Delivery } from "./deliveries.types";
 export type UserStore = {
   user: User | null;
   setUser: (user: User) => void;
@@ -18,6 +19,10 @@ export type UserStore = {
   requests: Request[];
   addNewRequest: (request: Request) => void;
   setRequests: (requests: Request[]) => void;
+
+  deliveries: Delivery[];
+  addNewDelivery: (delivery: Delivery) => void;
+  setDeliveries: (deliveries: Delivery[]) => void;
 };
 
 export type User = {

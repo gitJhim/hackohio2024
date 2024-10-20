@@ -95,6 +95,7 @@ const FoodImageModal = ({
       latitude: latitude,
       longitude: longitude,
       food_items: foodList,
+      weight: sumWeight,
       status: "pending",
     };
 

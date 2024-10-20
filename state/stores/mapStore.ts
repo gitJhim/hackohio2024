@@ -8,7 +8,10 @@ export const useMapStore = create<MapStore>(
   persist(
     immer((set) => ({
       pickups: [],
+      selectedPickup: null,
 
+      setSelectedPickup: (pickup: Pickup | null) =>
+        set({ selectedPickup: pickup }),
       addPickup: (pickup: Pickup) =>
         set((state: MapStore) => ({ pickups: [...state.pickups, pickup] })),
       setPickups: (pickups: Pickup[]) => set({ pickups }),

@@ -18,8 +18,8 @@ import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
 import FoodRequestModal from "./RequestFoodModal";
 import { useRouter } from "expo-router";
-
-
+import { addDelivery } from "../utils/db/deliveries";
+import uuid from "react-native-uuid";
 export default function Map() {
   const {
     pickups,
@@ -27,6 +27,8 @@ export default function Map() {
     destinationLocation: destination,
     setDestinationLocation: setDestination,
     setEstimatedTime,
+    setSelectedPickup,
+    selectedPickup,
   } = useMapStore();
   const { user } = useUserStore();
   const [travelInfo, setTravelInfo] = useState<{ distance: string } | null>(
@@ -93,7 +95,6 @@ export default function Map() {
     const remainingMinutes = Math.round(minutes % 60);
     return `${hours}h ${remainingMinutes}m`;
   }, []);
-
   const goToCurrentLocation = useCallback(() => {
     if (myLocation && mapRef.current) {
       mapRef.current.animateToRegion({
@@ -143,6 +144,7 @@ export default function Map() {
                 latitude: pickup.latitude,
                 longitude: pickup.longitude,
               });
+              setSelectedPickup(pickup);
             }}
           >
             <View className="bg-white rounded-2xl overflow-hidden shadow-lg w-72">
@@ -169,8 +171,16 @@ export default function Map() {
   }, [pickups, PickupMarker]);
 
   const onDelivered = async () => {
+    if (!user || !user.id || !selectedPickup) return;
+
+    await addDelivery({
+      id: uuid.v4().toString(),
+      user_id: user?.id,
+      items: selectedPickup?.food_items,
+      status: "completed",
+    });
     router.push("/delivered");
-}
+  };
 
   return (
     <View className="flex flex-col justify-center items-center">
@@ -248,7 +258,7 @@ export default function Map() {
 
       {user?.type === "driver" && (
         <TouchableOpacity
-          style={[styles.addButton, {backgroundColor: getThemeColor() }]}
+          style={[styles.addButton, { backgroundColor: getThemeColor() }]}
           onPress={() => onDelivered()}
         >
           <PackageOpen size={24} color="#fff" />

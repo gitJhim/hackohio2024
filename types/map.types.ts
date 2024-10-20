@@ -1,6 +1,8 @@
 export type MapStore = {
   pickups: Pickup[];
+  selectedPickup: Pickup | null;
 
+  setSelectedPickup: (pickup: Pickup | null) => void;
   addPickup: (foodBank: Pickup) => void;
   setPickups: (foodBanks: Pickup[]) => void;
 
@@ -25,5 +27,6 @@ export type Pickup = {
   longitude: number;
   food_items: string[];
   status: "pending" | "completed";
+  weight: number | undefined;
   created_at?: string | null;
 };
