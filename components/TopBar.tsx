@@ -4,17 +4,14 @@ import { useUserStore } from "../state/stores/userStore";
 import { Ionicons } from "@expo/vector-icons";
 import { useMapStore } from "../state/stores/mapStore";
 
-interface TopBarProps {
-  showButtons?: boolean;
-}
-
-export default function TopBar({ showButtons = true }: TopBarProps) {
+export default function TopBar() {
   const [activeButton, setActiveButton] = useState("Car");
+  const [showButtons, setShowButtons] = useState(false);
   const user = useUserStore((state) => state.user);
   const estimatedTime = useMapStore((state) => state.estimatedTime);
 
-  if (!user) {
-    showButtons = false;
+  if (user?.type === "driver") {
+    setShowButtons(true);
   }
 
   const getThemeColor = (): string => {
@@ -40,7 +37,7 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
   const styles = StyleSheet.create({
     container: {
       backgroundColor: themeColor,
-      height: 144,
+      height: showButtons ? 144 : 100,
       paddingTop: 36,
       alignItems: "center",
     },
