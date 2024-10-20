@@ -23,7 +23,11 @@ export const Navigator = () => {
   const offset3 = useSharedValue({ x: 0, y: 0 });
 
   useEffect(() => {
-    if (pathName == "/onboarding" || pathName == "/") {
+    if (
+      pathName == "/onboarding" ||
+      pathName == "/" ||
+      pathName == "/inputaddress"
+    ) {
       isVisible(false);
     } else {
       isVisible(true);

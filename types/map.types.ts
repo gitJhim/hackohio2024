@@ -16,8 +16,9 @@ export type Location = {
 };
 
 export type Pickup = {
-  id: string;
-  title: string;
+  id: string | null;
+  user_id: string;
   latitude: number;
   longitude: number;
+  food_items: string[];
 };

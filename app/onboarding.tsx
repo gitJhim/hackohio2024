@@ -24,6 +24,11 @@ const OnboardingScreen = () => {
     }
 
     await setUserType(user.id, selectedRole);
+
+    if (!user.lat || !user.lng) {
+      router.navigate("/inputaddress");
+      return;
+    }
     router.navigate("/home");
   };
 

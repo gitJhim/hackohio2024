@@ -10,7 +10,6 @@ export type RequestStore = {
 export type Request = {
   id: string;
   user_id: string;
-  data_id: string;
   created_at: string;
 };
 

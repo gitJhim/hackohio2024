@@ -68,6 +68,23 @@ export const setUserType = async (userId: string, type: string) => {
   return { user: data, error };
 };
 
+export const setFoodbankAddress = async (
+  userId: string,
+  lat: number,
+  lng: number,
+) => {
+  const { data, error } = await supabase
+    .from("users")
+    .update({
+      latitude: lat,
+      longitude: lng,
+    })
+    .eq("id", userId)
+    .select("*");
+
+  return { user: data, error };
+};
+
 export const loadLogs = async (userId: string) => {
   const { data, error } = await supabase
     .from("logs")
