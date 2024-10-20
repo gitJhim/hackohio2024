@@ -17,6 +17,7 @@ import { Pickup } from "../types/map.types";
 import DonateFoodModal from "./DonateFoodModal";
 import MapViewDirections from "react-native-maps-directions";
 import { getDistance } from "geolib";
+import { useRouter } from "expo-router"; 
 
 export default function Map() {
   const pickups = useMapStore((state) => state.pickups);
@@ -65,6 +66,11 @@ export default function Map() {
         return "#808080";
     }
   };
+
+  const router = useRouter();
+  const onDelivered = async () => {
+    router.push("/delivered");
+  }
 
   const updateTravelInfo = (result: any) => {
     setTravelInfo({
@@ -241,6 +247,14 @@ export default function Map() {
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: getThemeColor() }]}
           onPress={() => setIsDonateModalVisible(true)}
+        >
+          <LucidePlus size={24} color="#fff" />
+        </TouchableOpacity>
+      )}
+      {user?.type === "driver" && (
+        <TouchableOpacity
+          style={[styles.addButton, {backgroundColor: getThemeColor() }]}
+          onPress={() => onDelivered()}
         >
           <LucidePlus size={24} color="#fff" />
         </TouchableOpacity>
