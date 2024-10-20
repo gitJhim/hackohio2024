@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ScrollView, Text, View, Image, TextInput, TouchableOpacity, FlatList } from 'react-native';
 import { useUserStore } from '../state/stores/userStore';
-import { Plus, Trash2, Edit2, Clock, CheckCircle } from 'lucide-react-native';
+import { Plus, Trash2, Edit2, Clock, CheckCircle, TruckIcon, RefrigeratorIcon, HeartHandshakeIcon } from 'lucide-react-native';
 
 interface RequestedItem {
   id: string;
@@ -16,6 +16,14 @@ interface Donation {
   date: string;
   status: 'pending' | 'complete'
   
+}
+
+interface Delivery {
+  id: string;
+  route: string;
+  items: string;
+  date: string;
+  status: 'in-progress' | 'completed';
 }
 
 const Profile = () => {
@@ -56,6 +64,39 @@ const Profile = () => {
     },
   ]);
 
+  const [deliveryHistory, setDeliveryHistory] = useState<Delivery[]>([
+    {
+      id: '1',
+      route: 'Downtown Food Bank to Westside Community Center',
+      items: 'Non-perishables (500lbs), Fresh Produce (200lbs)',
+      date: '2023-06-18',
+      status: 'in-progress'
+    },
+    {
+      id: '2',
+      route: 'Central Warehouse to Northside Shelter',
+      items: 'Canned Goods (300 units), Hygiene Kits (100)',
+      date: '2023-06-15',
+      status: 'completed'
+    },
+    {
+      id: '3',
+      route: 'Grocery Partner to Eastside Food Bank',
+      items: 'Fresh Dairy (100 gallons), Bread (200 loaves)',
+      date: '2023-06-12',
+      status: 'completed'
+    },
+    {
+      id: '4',
+      route: 'Restaurant Donor to Southside Community Kitchen',
+      items: 'Prepared Meals (150 servings)',
+      date: '2023-06-10',
+      status: 'completed'
+    },
+  ]);
+
+
+
   const getHeaderColor = () => {
     switch (user?.type) {
       case 'driver':
@@ -66,6 +107,19 @@ const Profile = () => {
         return '#EF4444';
       default:
         return '#808080';
+    }
+  };
+
+  const getIcon = () => {
+    switch (user?.type) {
+      case 'driver':
+        return <TruckIcon size={20} color="#17A773"/>;
+      case 'foodbank':
+        return <RefrigeratorIcon size={20} color="#8B5CF6"/>
+      case 'donor': 
+        return <HeartHandshakeIcon size={20} color="#EF4444"/>
+      default: 
+        return null;
     }
   };
 
@@ -156,6 +210,27 @@ const Profile = () => {
     </View>
   );
 
+  const renderDeliveryItem = ({ item }: { item: Delivery }) => (
+    <View className="mb-4 p-4 bg-white rounded-lg shadow-md">
+      <View className="flex-row justify-between items-center mb-2">
+        <Text className="text-lg font-bold text-green-600">Delivery</Text>
+        <View className="flex-row items-center">
+          {item.status === 'in-progress' ? (
+            <Clock color="#eab308" size={15} />
+          ) : (
+            <CheckCircle color="#10B981" size={15} />
+          )}
+          <Text className={`ml-1 ${item.status === 'in-progress' ? 'text-yellow-500' : 'text-green-500'}`}>
+            {item.status === 'in-progress' ? 'In Progress' : 'Completed'}
+          </Text>
+        </View>
+      </View>
+      <Text className="text-sm font-semibold text-gray-700 mt-1">{item.route}</Text>
+      <Text className="text-sm text-gray-600 mt-1">{item.items}</Text>
+      <Text className="text-xs text-gray-500 mt-2">{item.date}</Text>
+    </View>
+  );
+
   return (
     <View className="flex-1 bg-gray-100">
       <ScrollView
@@ -186,9 +261,14 @@ const Profile = () => {
             <Text className="text-xl font-bold mt-4 text-gray-800">
               @{user?.name || 'Username'}
             </Text>
-            <Text className="text-lg mt-2 capitalize text-gray-600">
-              {user?.type || 'User'}
-            </Text>
+            <View className="flex-row items-center  bg-white h-10 justify-center p-2 rounded-full">
+              <Text className="text-lg capitalize font-bold mr-1">
+                {user?.type || 'User'}
+              </Text>
+              <View className="flex items-center justify-center pt-4">
+                {getIcon()}
+              </View>
+            </View>
           </View>
 
           {user?.type === 'foodbank' && (
@@ -245,7 +325,12 @@ const Profile = () => {
           {user?.type === 'driver' && (
             <View className="mt-4">
               <Text className="text-2xl font-bold mb-4 text-green-700">Driver Dashboard</Text>
-              {/* Add driver-specific content here */}
+              <FlatList
+                data={deliveryHistory}
+                renderItem={renderDeliveryItem}
+                keyExtractor={item => item.id}
+                scrollEnabled={false}
+              />
             </View>
           )}
         </View>
