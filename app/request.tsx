@@ -171,4 +171,3 @@ const FoodBankList: React.FC = () => {
 };
 
 export default FoodBankList;
-
