@@ -1,7 +1,7 @@
-import { useState } from "react";
-import { View, Text, TouchableOpacity, Image, FlatList } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, TouchableOpacity, Image, FlatList, TextInput} from "react-native";
 import Modal from "react-native-modal";
-import { Camera } from "lucide-react-native";
+import { Camera, Trash2 } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useFoodvisor } from "../hooks/useFoodvisor";
 import { useUserStore } from "../state/stores/userStore";
@@ -27,12 +27,32 @@ const FoodImageModal = ({
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset>();
   const { foodNames, analyzeImageWithFoodvisor, loading, error } =
     useFoodvisor();
+  const [foodList, setFoodList] = useState<string[]>([])
+  const [newItem, setNewItem] = useState("");
+
+  useEffect(() => {
+setFoodList(foodNames)
+  }, [foodNames]);
+
+  const addItem = () => {
+    if (newItem.trim()){
+      setFoodList([...foodList, newItem.trim()]);
+      setNewItem("");
+    }
+  };
+
+  const deleteItem = (index: number) => {
+    setFoodList(foodList.filter((_, i) => i !== index));
+  };
+
+
 
   const processImage = async (result: ImagePicker.ImagePickerResult) => {
     if (!result.canceled) {
       setImage(result.assets[0]);
       await analyzeImageWithFoodvisor(result.assets[0].uri);
     }
+    console.log("processed: ", foodNames)
   };
 
   const pickImage = async () => {
@@ -152,25 +172,46 @@ const FoodImageModal = ({
               </Text>
             )}
 
-            {/* Food Items List */}
-            {foodNames.length > 0 && (
+            {(image || foodList.length > 0) && (
+            <>
               <View className="mt-4 mb-4">
                 <Text className="font-bold text-lg mb-2 text-gray-800">
                   Detected Foods:
                 </Text>
                 <View className="bg-gray-50 rounded-lg p-3 max-h-32">
                   <FlatList
-                    data={foodNames}
-                    renderItem={({ item }) => (
-                      <Text className="text-base mb-1 text-gray-700">
-                        • {item}
-                      </Text>
+                    data={foodList}
+                    renderItem={({ item, index }) => (
+                      <View className="flex-row justify-between items-center mb-1">
+                      <Text className="text-base text-gray-700">• {item}</Text>
+                      <TouchableOpacity onPress={() => deleteItem(index)}>
+                        <Trash2 color="red" size={20} />
+                      </TouchableOpacity>
+                    </View>
                     )}
                     keyExtractor={(item, index) => index.toString()}
                   />
                 </View>
               </View>
+
+              {/* Manual Item Addition */}
+              <View className="flex-row mt-2">
+                <TextInput
+                  className="flex-1 border border-gray-300 rounded-l-lg p-2"
+                  value={newItem}
+                  onChangeText={setNewItem}
+                  placeholder="Add item manually"
+                />
+                <TouchableOpacity
+                  onPress={addItem}
+                  className="bg-red-600 rounded-r-lg p-2 justify-center"
+                >
+                  <Text className="text-white font-bold">Add</Text>
+                </TouchableOpacity>
+              </View>
+            </>
             )}
+
 
             {/* Submit Button */}
             <TouchableOpacity
