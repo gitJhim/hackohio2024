@@ -10,7 +10,7 @@ import {
 import * as Location from "expo-location";
 import { useMapStore } from "../state/stores/mapStore";
 import { useUserStore } from "../state/stores/userStore";
-import { getPickups } from "../utils/db/map";
+import { getPickups, setPickupStatus } from "../utils/db/map";
 import { LucideLocate, LucidePlus, PackageOpen } from "lucide-react-native";
 import { GOOGLE_MAPS_API_KEY } from "@env";
 import { Pickup } from "../types/map.types";
@@ -171,7 +171,7 @@ export default function Map() {
   }, [pickups, PickupMarker]);
 
   const onDelivered = async () => {
-    if (!user || !user.id || !selectedPickup) return;
+    if (!user || !user.id || !selectedPickup || !selectedPickup.id) return;
 
     await addDelivery({
       id: uuid.v4().toString(),
@@ -179,6 +179,9 @@ export default function Map() {
       items: selectedPickup?.food_items,
       status: "completed",
     });
+
+    await setPickupStatus(selectedPickup.id, "completed");
+
     router.push("/delivered");
   };
 

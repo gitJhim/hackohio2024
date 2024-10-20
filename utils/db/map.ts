@@ -24,3 +24,16 @@ export const getPickups = async () => {
 
   return { data: data as Pickup[], error };
 };
+
+export const setPickupStatus = async (id: string, status: string) => {
+  const { data, error } = await supabase
+    .from("pickups")
+    .update({ status })
+    .eq("id", id);
+
+  if (error) {
+    console.log(error);
+  }
+
+  return { data, error };
+};
