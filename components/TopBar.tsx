@@ -78,7 +78,7 @@ export default function TopBar({ showButtons = true }: TopBarProps) {
   return (
     <View style={styles.container}>
       <View className="flex-row items-center w-11/12">
-        <View className="flex-row items-center p-2">
+        <View className="flex-row items-center p-2 pr-3">
           <Image
             source={require("../assets/dummyProfile.png")}
             alt="profile"
