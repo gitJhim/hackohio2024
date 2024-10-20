@@ -16,6 +16,7 @@ export default function AppLayout() {
           <Stack.Screen name="onboarding" options={{ headerShown: false }} />
           <Stack.Screen name="profile" options={{ headerShown: false }} />
           <Stack.Screen name="inputaddress" options={{ headerShown: false }} />
+          <Stack.Screen name="request" options={{ headerShown: false }} />
         </Stack>
         <Navigator />
       </ErrorBoundary>

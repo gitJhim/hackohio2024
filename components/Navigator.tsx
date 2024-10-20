@@ -157,11 +157,11 @@ export const Navigator = () => {
             <Animated.View style={[styles.subButton, animatedStyle2]}>
               <TouchableOpacity
                 style={
-                  isActive("/ranking")
+                  isActive("/request")
                     ? getActiveButtonStyle()
                     : getButtonStyle()
                 }
-                onPress={() => onLinkPress("/ranking")}
+                onPress={() => onLinkPress("/request")}
               >
                 <MaterialCommunityIcons
                   name="chart-areaspline"
