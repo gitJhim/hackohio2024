@@ -40,15 +40,12 @@ const FoodBankList: React.FC = () => {
         throw new Error("No food banks found");
       }
 
-      // Process each food bank and find its associated requests
       const processedBanks: FoodBank[] = foodBanksData
         .map((bank: any) => {
-          // Find all requests associated with this food bank
           const bankRequests = requests.filter(
-            (request) => request.user_id === bank.id,
+            (request: Request) => request.user_id === bank.id,
           );
 
-          // Only include food banks that have active requests
           if (bankRequests.length > 0) {
             return {
               name: bank.foodbank_name,

@@ -18,11 +18,8 @@ export const createRequest = async (userId: string, request: Request) => {
   return { data, error };
 };
 
-export const getRequests = async (userId: string) => {
-  const { data, error } = await supabase
-    .from("requests")
-    .select("*")
-    .eq("user_id", userId);
+export const getRequests = async () => {
+  const { data, error } = await supabase.from("requests").select("*");
 
   return { data, error };
 };
